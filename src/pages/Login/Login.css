@@ -1,0 +1,51 @@
+.Login{
+    display: flex;
+    flex-direction: column;
+    padding-top: 2%;
+    align-items: center;
+    text-align: center;
+}
+.form-login{
+    padding: 5%;
+    align-items: center;
+    border: 1px solid black;
+    text-align: center;
+    width: 50%;
+    border-radius: 8px;
+}
+button{
+    width: 35%;
+    height: 50px;
+}
+.inp-box{
+    width: 100%;
+}
+#btn-Register{
+    font-size: 15px;
+    width: max-content;
+    cursor: pointer;
+    color: transparent;
+	background-clip: text;
+	-webkit-background-clip: text;
+	background-image: linear-gradient( to right,  orange,  orangered);
+    margin-top: 2%;
+    position: relative;
+}
+#btn-Register::after{
+    background-image: linear-gradient( to right, orange  , orangered);
+    position: absolute;
+    content: ' ';
+    width: 0;
+    height: 2px;
+    top: 20px;
+    left: 50%;
+    border-radius: 30px;
+	transform: translate(-50%);
+	transition: width 0.2s;
+}
+#btn-Register:hover:after{
+    width: 100%;
+}
+#title{
+    font-size: 80px;
+}

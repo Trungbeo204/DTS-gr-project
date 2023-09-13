@@ -1,0 +1,50 @@
+.table-body tr td {
+  border: none;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  text-overflow: ellipsis;
+}
+.btn-option {
+  cursor: pointer;
+  display: flex;
+  justify-content: space-around;
+}
+.Form-edit table {
+  width: 100%;
+}
+.Form-edit table tr td {
+  padding: 2%;
+}
+.Form-edit table tr td input {
+  border: none;
+  outline: none;
+}
+.btn-open {
+  border: none;
+  background-color: rgba(0, 0, 0, 0);
+}
+.cantUpdate{
+  display: none;
+}
+.cantEdit{
+  opacity: 0.2;
+}
+.profile-client table{
+  width: 100%;
+}
+.profile-client table tr td{
+  width: 50%;
+  border: 1px solid black;
+  padding: 2%;
+}
+.profile-client table tr td input {
+  border: none;
+  outline: none;
+}
+.btn-save{
+  margin-top: 5%;
+  border: none;
+  background-color: lightblue;
+  width: max-content;
+  padding: 0 3%;
+  border-radius: 8px;
+}
