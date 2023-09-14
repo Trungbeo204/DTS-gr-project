@@ -15,7 +15,7 @@ import { faDeleteLeft, faPenToSquare } from "@fortawesome/free-solid-svg-icons";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useSelector } from "react-redux";
-import { getAPI } from "../../configs/api";
+import { deleteAPI, getAPI, postAPI } from "../../configs/api";
 
 function ListUser(args) {
   const fakeData = [
@@ -45,7 +45,7 @@ function ListUser(args) {
     },
   ];
 
-  const RoleUser = localStorage.getItem("role");
+  const RoleUser = localStorage.getItem("roleUser");
   const dataUser = useSelector((state) => state.user);
 
   const [modal, setModal] = useState(false);
@@ -57,20 +57,18 @@ function ListUser(args) {
   const email = useRef();
   const password = useRef();
 
-  console.log(RoleUser);
-
-  // useEffect(() => {
-  //   async function ListUserData() {
-  //     try {
-  //       const response = await getAPI("");
-  //       const data = response.data;
-  //       setData(data);
-  //     } catch (error) {
-  //       console.error(">>err :", error);
-  //     }
-  //   }
-  //   ListUserData();
-  // }, []);
+  useEffect(() => {
+    async function ListUserData() {
+      try {
+        const response = await getAPI("");
+        const data = response.data;
+        setData(data);
+      } catch (error) {
+        console.error(">>err :", error);
+      }
+    }
+    ListUserData();
+  }, []);
 
   const toggle = () => {
     setModal(!modal);
@@ -83,47 +81,106 @@ function ListUser(args) {
     setSelectedRole(role);
   }
 
-  function handleSave() {
-    const updatedUser = {
-      name: name.current.value,
-      fullName: fullName.current.value,
-      email: email.current.value,
-      password: password.current.value,
-      role: selectedRole,
-    };
-    const updatedData = Data.map((item) => {
-      if (item.id === proFileUser.id) {
-        return { ...item, ...updatedUser };
+  const handleSave = async () => {
+    // const updatedUser = {
+    //   name: name.current.value,
+    //   fullName: fullName.current.value,
+    //   email: email.current.value,
+    //   password: password.current.value,
+    //   role: selectedRole,
+    // };
+    // const updatedData = Data.map((item) => {
+    //   if (item.id === proFileUser.id) {
+    //     return { ...item, ...updatedUser };
+    //   }
+    //   return item;
+    // });
+    // setData(updatedData);
+    // toggle();
+    // toast.success("Done");
+    try {
+      if (name.current.value !== "") {
+        toast.error("tên không được để trống.");
       }
-      return item;
-    });
-    setData(updatedData);
-    toggle();
-    toast.success("Done");
-  }
+      if (fullName.current.value !== "") {
+        toast.error("tên đầy đủ không được để trống.");
+      }
+      if (email.current.value !== "") {
+        toast.error("email không được để trống.");
+      }
+      if (password.current.value !== "") {
+        toast.error("password không được để trống.");
+      }
+      await postAPI("", {
+        userName: name.current.value,
+        fullName: fullName.current.value,
+        email: email.current.value,
+        passwordUser: password.current.value,
+        role: selectedRole,
+      })
+        .then((res) => {
+          toast.success("Cập nhật thành công");
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    } catch (error) {
+      toast.error("Cập nhật thất bại");
+    }
+  };
 
-  function handleDelete(){
-    console.log(1);
+  function handleDelete() {
+    deleteAPI("")
+      .then((res) => {
+        toast.success("Xóa thành công ");
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }
 
   const handleCancel = () => {
     toggle();
   };
 
-  function handleSaveClient() {
-    const updatedUser = {
-      name: name.current.value,
-      fullName: fullName.current.value,
-      email: email.current.value,
-    };
-    const updatedData = Data.map((item) => {
-      if (item.id === dataUser.id) {
-        return { ...item, ...updatedUser };
+  const  handleSaveClient = async () => {
+    // const updatedUser = {
+    //   name: name.current.value,
+    //   fullName: fullName.current.value,
+    //   email: email.current.value,
+    // };
+    // const updatedData = Data.map((item) => {
+    //   if (item.id === dataUser.id) {
+    //     return { ...item, ...updatedUser };
+    //   }
+    //   return item;
+    // });
+    // setData(updatedData);
+    // toast.success("Done");
+    try {
+      if (name.current.value !== "") {
+        toast.error("tên không được để trống.");
       }
-      return item;
-    });
-    setData(updatedData);
-    toast.success("Done");
+      if (fullName.current.value !== "") {
+        toast.error("tên đầy đủ không được để trống.");
+      }
+      if (email.current.value !== "") {
+        toast.error("email không được để trống.");
+      }
+      postAPI("", {
+        nameUser: name.current.value,
+        fullName: fullName.current.value,
+        email: email.current.value,
+      })
+        .then((res) => {
+          toast.success("thay đổi thành công. ");
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    } catch (error) {
+      toast.error('thay đổi thất bại. ')
+    }
   }
 
   return (
@@ -242,7 +299,7 @@ function ListUser(args) {
         )}
         {RoleUser === "ROLE_CLIENT" && (
           <div>
-            <p>Profile {`${dataUser.name}`}</p>
+            <p>Profile {`${dataUser?.name}`}</p>
             <div className="profile-client">
               <table>
                 <tr>

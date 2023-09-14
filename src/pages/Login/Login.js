@@ -12,8 +12,8 @@ import { useDispatch } from "react-redux";
 import { postAPI } from "../../configs/api";
 
 function Login() {
-  const nextTo = useNavigate();
-  const [dataUser, setDataUser] = useState([])  // const dispatch = useDispatch();
+  const next = useNavigate();
+  const dispatch = useDispatch();
 
   // const fakeApi = [
   //   {
@@ -47,12 +47,12 @@ function Login() {
 
   const formik = useFormik({
     initialValues: {
-      userName: "",
-      passWordUser: "",
+      email: "",
+      password: "",
     },
     validationSchema: yup.object().shape({
-      userName: yup.string().required("bắt buộc"),
-      passWordUser: yup
+      email: yup.string().email("email không hợp lệ").required("bắt buộc"),
+      password: yup
         .string()
         .min(8)
         .matches(
@@ -62,7 +62,8 @@ function Login() {
         .required("bắt buộc"),
     }),
     onSubmit: (values) => {
-      console.log(">> name", values);
+      console.log(1);
+      // console.log(">>values", values);
       // const { email, password } = values;
       // const user = fakeApi.find((user) => user.email === email && user.password === password);
     
@@ -74,28 +75,29 @@ function Login() {
       // } else {
       //   toast.error("Thông tin đăng nhập không hợp lệ. Vui lòng thử lại!");
       // }
-      postAPI('http://localhost:8080/user/signin',{
-        userName:values.userName,
-        passWordUser: values.passWordUser,
-      }).then((res) => {
-        const data = res.data.data
-        nextTo("/ListUser")
-        setDataUser(data)
-        // dispatch(setUser(values))
-        // localStorage.setItem('token', values.token)
-        console.log(res);
-      }
-      ).catch((err) => {
+
+      postAPI('http://localhost:8080/user/signin', {  
+        userName: values.userName,
+        passwordUser:values.password
+      }).then((res)=> {
+        const dataLogin = res.data.data
+        dispatch(setUser(dataLogin));
+        localStorage.setItem('roleUser', dataLogin.role)
+        localStorage.setItem('token', dataLogin.token)
+        console.log(dataLogin.role);
+        toast.success('Đăng nhập thành công.')
+        next("/ListUser")
+      }).catch((err) => {
         console.log(err);
-        console.log(2);
+        toast.error("Thông tin đăng nhập không hợp lệ. Vui lòng thử lại!");
       })
     },
   });
-  console.log(1, dataUser);
-  localStorage.setItem('role', dataUser.role)
+  // console.log(1, dataUser);
+  // localStorage.setItem('role', dataUser.role)
 
   const handleToRegister = () => {
-    nextTo("/Register");
+    next("/Register");
   };
 
   return (
@@ -109,7 +111,7 @@ function Login() {
                 id="userName"
                 name="userName"
                 label="userName"
-                type="userName"
+                type="text"
                 fullWidth
                 margin="normal"
                 variant="outlined"
