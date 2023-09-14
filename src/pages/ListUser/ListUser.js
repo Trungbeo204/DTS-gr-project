@@ -49,13 +49,15 @@ function ListUser(args) {
   const dataUser = useSelector((state) => state.user);
 
   const [modal, setModal] = useState(false);
-  const [Data, setData] = useState(fakeData);
+  const [Data, setData] = useState([]);
   const [proFileUser, setProFileUser] = useState();
   const [selectedRole, setSelectedRole] = useState();
   const name = useRef();
   const fullName = useRef();
   const email = useRef();
   const password = useRef();
+
+  console.log(RoleUser);
 
   // useEffect(() => {
   //   async function ListUserData() {
@@ -156,7 +158,7 @@ function ListUser(args) {
                   </tr>
                   <tr
                     className={`${
-                      RoleUser === "SUPERADMIN" ? "canUpdate" : "cantUpdate"
+                      RoleUser === "ROLE_SUPERADMIN" ? "canUpdate" : "cantUpdate"
                     }`}
                   >
                     <td>Password</td>
@@ -169,7 +171,7 @@ function ListUser(args) {
                   </tr>
                   <tr
                     className={`${
-                      RoleUser === "SUPERADMIN" ? "canUpdate" : "cantUpdate"
+                      RoleUser === "ROLE_SUPERADMIN" ? "canUpdate" : "cantUpdate"
                     }`}
                   >
                     <td>Role</td>
@@ -178,9 +180,9 @@ function ListUser(args) {
                         value={selectedRole}
                         onChange={(e) => setSelectedRole(e.target.value)}
                       >
-                        <option value="SUPER ADMIN">SUPER ADMIN</option>
-                        <option value="ADMIN">ADMIN</option>
-                        <option value="CLIENT">CLIENT</option>
+                        <option value="ROLE_SUPERADMIN">SUPER ADMIN</option>
+                        <option value="ROLE_ADMIN">ADMIN</option>
+                        <option value="ROLE_CLIENT">CLIENT</option>
                       </select>
                     </td>
                   </tr>
@@ -197,7 +199,7 @@ function ListUser(args) {
             </Button>
           </ModalFooter>
         </Modal>
-        {(RoleUser === "SUPERADMIN" || RoleUser === "ADMIN") && (
+        {(RoleUser === "ROLE_SUPERADMIN" || RoleUser === "ROLE_ADMIN") && (
           <>
             <h1>List User</h1>
             <Table hover>
@@ -225,7 +227,7 @@ function ListUser(args) {
                         >
                           <FontAwesomeIcon icon={faPenToSquare} />
                         </button>
-                        {RoleUser === "SUPERADMIN" && (
+                        {RoleUser === "ROLE_SUPERADMIN" && (
                           <button className="btn-open" onClick={handleDelete}>
                             <FontAwesomeIcon icon={faDeleteLeft} />
                           </button>
@@ -238,7 +240,7 @@ function ListUser(args) {
             </Table>
           </>
         )}
-        {RoleUser === "CLIENT" && (
+        {RoleUser === "ROLE_CLIENT" && (
           <div>
             <p>Profile {`${dataUser.name}`}</p>
             <div className="profile-client">

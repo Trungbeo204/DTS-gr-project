@@ -42,15 +42,16 @@ const Register = () => {
         ),
     }),
     onSubmit: (values) => {
-      postAPI("", {
-        name: values.name,
+      postAPI("http://localhost:8080/user/signup", {
+        nameUser: values.name,
         fullName: values.fullName,
         email: values.email,
-        password: values.password,
+        passWordUser: values.password,
       })
         .then((res) => {
           toast.success("Đăng kí thành công ");
           next("/Login");
+          console.log(res);
         })
         .catch((err) => {
           toast.error(err);
