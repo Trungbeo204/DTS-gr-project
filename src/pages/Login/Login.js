@@ -63,32 +63,35 @@ function Login() {
         .required("bắt buộc"),
     }),
     onSubmit: (values) => {
-      // console.log(">>values", values);
-      // const { email, password } = values;
-      // const user = fakeApi.find((user) => user.email === email && user.password === password);
+      console.log(1);
+      console.log(">>values", values);
+      const { email, password } = values;
+      const user = fakeApi.find((user) => user.email === email && user.password === password);
     
-      // if (user) {
-      //   dispatch(setUser(user));
-      //   next("/ListUser");
-      //   localStorage.setItem('role',user.role)
-      //   localStorage.setItem('token', user.token)
-      // } else {
-      //   toast.error("Thông tin đăng nhập không hợp lệ. Vui lòng thử lại!");
-      // }
-
-      postAPI('', {  
-        userName: values.userName,
-        passwordUser:values.password
-      }).then((res)=> {
-        const dataLogin = res.data.data
-        localStorage.setItem('roleUser', dataLogin.role)
-        localStorage.setItem('token', dataLogin.token)
-        toast.success('Đăng nhập thành công.')
-        next("/ListUser")
-      }).catch((err) => {
-        console.log(err);
+      if (user) {
+        dispatch(setUser(user));
+        next("/ListUser");
+        localStorage.setItem('role',user.role)
+        localStorage.setItem('token', user.token)
+      } else {
         toast.error("Thông tin đăng nhập không hợp lệ. Vui lòng thử lại!");
-      })
+      }
+      
+
+      // postAPI('', {  
+      //   userName: values.userName,
+      //   passwordUser:values.password
+      // }).then((res)=> {
+      //   dispatch(setUser(res.data.data));
+      //   const dataLogin = res.data.data
+      //   localStorage.setItem('roleUser', dataLogin.role)
+      //   localStorage.setItem('token', dataLogin.token)
+      //   toast.success('Đăng nhập thành công.')
+      //   next("/ListUser")
+      // }).catch((err) => {
+      //   console.log(err);
+      //   toast.error("Thông tin đăng nhập không hợp lệ. Vui lòng thử lại!");
+      // })
     },
   });
 
