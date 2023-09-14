@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import "./Login.css";
 import { useNavigate } from "react-router-dom";
 
@@ -9,10 +9,12 @@ import * as yup from "yup";
 import { Box, Button, TextField } from "@mui/material";
 import { setUser } from '../../reducer/userProfile';
 import { useDispatch } from "react-redux";
+import { postAPI } from "../../configs/api";
 
 function Login() {
   const next = useNavigate();
   const dispatch = useDispatch();
+  const [dataUser, setDataUser] = useState([])
 
   const fakeApi = [
     {
@@ -46,11 +48,11 @@ function Login() {
 
   const formik = useFormik({
     initialValues: {
-      email: "",
+      userName: "",
       password: "",
     },
     validationSchema: yup.object().shape({
-      email: yup.string().email("email không hợp lệ").required("bắt buộc"),
+      userName: yup.string().required("bắt buộc"),
       password: yup
         .string()
         .min(8)
@@ -61,17 +63,32 @@ function Login() {
         .required("bắt buộc"),
     }),
     onSubmit: (values) => {
-      const { email, password } = values;
-      const user = fakeApi.find((user) => user.email === email && user.password === password);
+      // console.log(">>values", values);
+      // const { email, password } = values;
+      // const user = fakeApi.find((user) => user.email === email && user.password === password);
     
-      if (user) {
-        dispatch(setUser(user));
-        next("/ListUser");
-        localStorage.setItem('role',user.role)
-        localStorage.setItem('token', user.token)
-      } else {
+      // if (user) {
+      //   dispatch(setUser(user));
+      //   next("/ListUser");
+      //   localStorage.setItem('role',user.role)
+      //   localStorage.setItem('token', user.token)
+      // } else {
+      //   toast.error("Thông tin đăng nhập không hợp lệ. Vui lòng thử lại!");
+      // }
+
+      postAPI('', {  
+        userName: values.userName,
+        passwordUser:values.password
+      }).then((res)=> {
+        const dataLogin = res.data.data
+        localStorage.setItem('roleUser', dataLogin.role)
+        localStorage.setItem('token', dataLogin.token)
+        toast.success('Đăng nhập thành công.')
+        next("/ListUser")
+      }).catch((err) => {
+        console.log(err);
         toast.error("Thông tin đăng nhập không hợp lệ. Vui lòng thử lại!");
-      }
+      })
     },
   });
 
@@ -87,17 +104,17 @@ function Login() {
             <p id="title">LogIn</p>
             <div className="inp-box">
               <TextField
-                id="email"
-                name="email"
-                label="Email"
-                type="email"
+                id="userName"
+                name="userName"
+                label="userName"
+                type="text"
                 fullWidth
                 margin="normal"
                 variant="outlined"
-                value={formik.values.email}
+                value={formik.values.userName}
                 onChange={formik.handleChange}
-                error={formik.touched.email && Boolean(formik.errors.email)}
-                helperText={formik.touched.email && formik.errors.email}
+                error={formik.touched.userName && Boolean(formik.errors.userName)}
+                helperText={formik.touched.userName && formik.errors.userName}
               />
               <TextField
                 id="password"
