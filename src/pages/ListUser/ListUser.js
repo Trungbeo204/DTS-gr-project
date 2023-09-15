@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./ListUser.css";
 
 import {
@@ -33,6 +34,7 @@ function ListUser(args) {
   const fullName = useRef();
   const email = useRef();
   const password = useRef();
+  const next = useNavigate()
 
   useEffect(() => {
     if (RoleUser === 'ROLE_SUPERADMIN' || RoleUser === 'ROLE_ADMIN') {
@@ -115,7 +117,7 @@ function ListUser(args) {
   };
 
   const handleSaveClient = async () => {
-    try {
+    try {  
       if (name.current.value === "") {
         toast.error("tên không được để trống.");
       }
@@ -141,6 +143,11 @@ function ListUser(args) {
       toast.error("thay đổi thất bại. ");
     }
   };
+
+  function handleLogout() {
+    localStorage.removeItem('token')
+    next('/Login')
+  }
 
   return (
     <div>
@@ -223,6 +230,7 @@ function ListUser(args) {
               Cancel
             </Button>
           </ModalFooter>
+          <button onClick={handleLogout}> Log out</button>
         </Modal>
         {(RoleUser === "ROLE_SUPERADMIN" || RoleUser === "ROLE_ADMIN") && (
           <>
