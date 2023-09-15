@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import "./Login.css";
 import { useNavigate } from "react-router-dom";
 
@@ -36,8 +36,8 @@ function Login() {
     }),
     onSubmit: (values) => {
       postAPI('', {  
-        userName: values.userName,
-        passwordUser:values.password
+        userName: values.userName, 
+        passWordUser:values.password
       }).then((res)=> {
         dispatch(setUser(res.data.data));
         const dataLogin = res.data.data
