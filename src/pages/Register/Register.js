@@ -6,7 +6,6 @@ import { ToastContainer, toast } from "react-toastify";
 import { Button, TextField, Box } from "@mui/material";
 import { useFormik } from "formik";
 import * as yup from "yup";
-import axios from "axios";
 import { postAPI } from "../../configs/api";
 
 const Register = () => {
@@ -49,11 +48,12 @@ const Register = () => {
         password: values.password,
       })
         .then((res) => {
-          toast.success("Đăng kí thành công ");
+          toast.success("Đăng ký thành công. ");
           next("/Login");
         })
         .catch((err) => {
-          toast.error(err);
+          toast.error('Đăng ký không thành công. ');
+          console.log(err);
         });
     },
   });

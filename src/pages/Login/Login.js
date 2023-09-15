@@ -14,34 +14,6 @@ import { postAPI } from "../../configs/api";
 function Login() {
   const next = useNavigate();
   const dispatch = useDispatch();
-  const [dataUser, setDataUser] = useState([])
-
-  const fakeApi = [
-    {
-      name: "user1",
-      fullName: "user1",
-      email: "user1@gmail.com",
-      password: "Trung@123",
-      role: "SUPERADMIN",
-      id: 0,
-    },
-    {
-      name: "user2",
-      fullName: "user2",
-      email: "user2@gmail.com",
-      password: "Trung@123",
-      role: "ADMIN",
-      id: 1,
-    },
-    {
-      name: "user3",
-      fullName: "user3",
-      email: "user3@gmail.com",
-      password: "Trung@123",
-      role: "CLIENT",
-      id: 2,
-    },
-  ];
 
   const regex =
     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/;
@@ -63,35 +35,20 @@ function Login() {
         .required("bắt buộc"),
     }),
     onSubmit: (values) => {
-      console.log(1);
-      console.log(">>values", values);
-      const { email, password } = values;
-      const user = fakeApi.find((user) => user.email === email && user.password === password);
-    
-      if (user) {
-        dispatch(setUser(user));
-        next("/ListUser");
-        localStorage.setItem('role',user.role)
-        localStorage.setItem('token', user.token)
-      } else {
-        toast.error("Thông tin đăng nhập không hợp lệ. Vui lòng thử lại!");
-      }
-      
-
-      // postAPI('', {  
-      //   userName: values.userName,
-      //   passwordUser:values.password
-      // }).then((res)=> {
-      //   dispatch(setUser(res.data.data));
-      //   const dataLogin = res.data.data
-      //   localStorage.setItem('roleUser', dataLogin.role)
-      //   localStorage.setItem('token', dataLogin.token)
-      //   toast.success('Đăng nhập thành công.')
-      //   next("/ListUser")
-      // }).catch((err) => {
-      //   console.log(err);
-      //   toast.error("Thông tin đăng nhập không hợp lệ. Vui lòng thử lại!");
-      // })
+      postAPI('', {  
+        userName: values.userName,
+        passwordUser:values.password
+      }).then((res)=> {
+        dispatch(setUser(res.data.data));
+        const dataLogin = res.data.data
+        localStorage.setItem('token', dataLogin.token)
+        localStorage.setItem('roleUser', dataLogin.role)
+        toast.success('Đăng nhập thành công.')
+        next("/ListUser")
+      }).catch((err) => {
+        console.log(err);
+        toast.error("Thông tin đăng nhập không chính xác. Vui lòng thử lại!");
+      })
     },
   });
 
@@ -109,7 +66,7 @@ function Login() {
               <TextField
                 id="userName"
                 name="userName"
-                label="userName"
+                label="Tên đăng nhập"
                 type="text"
                 fullWidth
                 margin="normal"

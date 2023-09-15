@@ -1,5 +1,5 @@
-import axios from 'axios';
-let token = window.localStorage.getItem('Token')
+import axios from '../axios';
+let token = window.localStorage.getItem('token')
 
 export const getAPI = function(url){
     return axios.get(url, {headers: {Authorization: token} })

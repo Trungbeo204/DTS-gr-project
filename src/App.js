@@ -8,6 +8,7 @@ import Home from "./pages/Home/Home";
 
 function App() {
   const user = useSelector((state) => state.user);
+  const token = localStorage.getItem('token');
   return (
     <div className="App">
       <BrowserRouter>
@@ -17,8 +18,13 @@ function App() {
           <Route
             path="/ListUser"
             element={user ? <ListUser /> : <Navigate to="/Login" />}
+            // element={<ListUser/>}
           />
-          <Route path="/" element={user ? <Home /> : <Navigate to="/Login" />}/>
+          <Route
+            path="/"
+            element={user ? <Home /> : <Navigate to="/Login" />}
+            // element={<Home/>}
+          />
         </Routes>
       </BrowserRouter>
     </div>
