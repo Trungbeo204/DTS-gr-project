@@ -20,37 +20,12 @@ import { deleteAPI, getAPI, postAPI } from "../../configs/api";
 function ListUser(args) {
   const regex =
     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/;
+  const regexEmail = /^([a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6})*$/;
   const RoleUser = localStorage.getItem("roleUser");
   const dataUser = useSelector((state) => state.user);
 
-  var fakeApi = [
-    {
-      name: "user1",
-      fullName: "user1",
-      email: "user1@gmail.com",
-      password: "Trung@123",
-      role: "SUPERADMIN",
-      id: 0,
-    },
-    {
-      name: "user2",
-      fullName: "user1",
-      email: "user1@gmail.com",
-      password: "Trung@123",
-      role: "SUPERADMIN",
-      id: 1,
-    },
-    {
-      name: "user3",
-      fullName: "user1",
-      email: "user1@gmail.com",
-      password: "Trung@123",
-      role: "SUPERADMIN",
-      id: 2,
-    },
-  ];
   const [modal, setModal] = useState(false);
-  const [Data, setData] = useState(fakeApi);
+  const [Data, setData] = useState([]);
   const [proFileUser, setProFileUser] = useState();
   const [selectedRole, setSelectedRole] = useState();
   const [count, setCount] = useState(0);
@@ -60,17 +35,20 @@ function ListUser(args) {
   const password = useRef();
 
   useEffect(() => {
-    async function ListUserData() {
-      try {
-        const response = await getAPI("");
-        const data = response.data;
-        setData(data);
-      } catch (error) {
-        console.error(">>err :", error);
+    if (RoleUser === 'ROLE_SUPERADMIN' || RoleUser === 'ROLE_ADMIN') {
+      async function ListUserData() {
+        try {
+          const response = await getAPI("http://localhost:8080/user/auth/all");
+          console.log(2);
+          const data = response.data;
+          setData(data);
+        } catch (error) {
+          console.error(">>err :", error);
+        }
       }
+      ListUserData();
     }
-    ListUserData();
-  }, [count]);
+  }, [RoleUser, count]);
 
   const toggle = () => {
     setModal(!modal);
@@ -84,22 +62,6 @@ function ListUser(args) {
   }
 
   const handleSave = async () => {
-    // const updatedUser = {
-    //   name: name.current.value,
-    //   fullName: fullName.current.value,
-    //   email: email.current.value,
-    //   password: password.current.value,
-    //   role: selectedRole,
-    // };
-    // const updatedData = Data.map((item) => {
-    //   if (item.id === proFileUser.id) {
-    //     return { ...item, ...updatedUser };
-    //   }
-    //   return item;
-    // });
-    // setData(updatedData);
-    // toggle();
-    // toast.success("Done");
     try {
       if (name.current.value === "") {
         toast.error("tên không được để trống.");
@@ -109,26 +71,20 @@ function ListUser(args) {
       }
       if (email.current.value === "") {
         toast.error("email không được để trống.");
+      } else if (!regexEmail.test(email.current.value)) {
+        toast.error('không đúng định dạng email.')
       }
       if (password.current.value === "") {
         toast.error("password không được để trống.");
       } else if (!regex.test(password.current.value)) {
-        toast.error("Định dạng mật khẩu không đúng");
+        toast.error("Định dạng mật khẩu không đúng.");
       }
-
-      const res = await postAPI("", {
-        userName: name.current.value,
-        fullName: fullName.current.value,
-        email: email.current.value,
-        passwordUser: password.current.value,
-        role: selectedRole,
-      });
 
       postAPI("", {
         userName: name.current.value,
         fullName: fullName.current.value,
         email: email.current.value,
-        passwordUser: password.current.value,
+        passWordUser: password.current.value,
         role: selectedRole,
       })
         .then((res) => {
@@ -160,19 +116,6 @@ function ListUser(args) {
   };
 
   const handleSaveClient = async () => {
-    // const updatedUser = {
-    //   name: name.current.value,
-    //   fullName: fullName.current.value,
-    //   email: email.current.value,
-    // };
-    // const updatedData = Data.map((item) => {
-    //   if (item.id === dataUser.id) {
-    //     return { ...item, ...updatedUser };
-    //   }
-    //   return item;
-    // });
-    // setData(updatedData);
-    // toast.success("Done");
     try {
       if (name.current.value === "") {
         toast.error("tên không được để trống.");
@@ -245,7 +188,7 @@ function ListUser(args) {
                     <td>Password</td>
                     <td>
                       <input
-                        defaultValue={proFileUser?.password}
+                        defaultValue={proFileUser?.passWordUser}
                         ref={password}
                       />
                     </td>
@@ -299,7 +242,7 @@ function ListUser(args) {
                 return (
                   <tbody className="table-body">
                     <tr>
-                      <th>{item.name}</th>
+                      <th>{item.userName}</th>
                       <td>{item.fullName}</td>
                       <td>{item.email}</td>
                       <td>{item.role}</td>

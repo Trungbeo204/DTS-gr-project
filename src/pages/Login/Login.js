@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import "./Login.css";
 import { useNavigate } from "react-router-dom";
 
@@ -35,7 +35,6 @@ function Login() {
         .required("bắt buộc"),
     }),
     onSubmit: (values) => {
-      console.log(values);
       postAPI('http://localhost:8080/user/signin', {  
         userName: values.userName,
         passWordUser:values.passWordUser
