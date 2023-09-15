@@ -15,33 +15,6 @@ function Login() {
   const next = useNavigate();
   const dispatch = useDispatch();
 
-  // const fakeApi = [
-  //   {
-  //     name: "user1",
-  //     fullName: "user1",
-  //     email: "user1@gmail.com",
-  //     password: "Trung@123",
-  //     role: "SUPERADMIN",
-  //     id: 0,
-  //   },
-  //   {
-  //     name: "user2",
-  //     fullName: "user2",
-  //     email: "user2@gmail.com",
-  //     password: "Trung@123",
-  //     role: "ADMIN",
-  //     id: 1,
-  //   },
-  //   {
-  //     name: "user3",
-  //     fullName: "user3",
-  //     email: "user3@gmail.com",
-  //     password: "Trung@123",
-  //     role: "CLIENT",
-  //     id: 2,
-  //   },
-  // ];
-
   const regex =
     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/;
 
@@ -63,35 +36,23 @@ function Login() {
     }),
     onSubmit: (values) => {
       console.log(1);
-      // console.log(">>values", values);
-      // const { email, password } = values;
-      // const user = fakeApi.find((user) => user.email === email && user.password === password);
-    
-      // if (user) {
-      //   dispatch(setUser(user));
-      //   next("/ListUser");
-      //   localStorage.setItem('role',user.role)
-      //   localStorage.setItem('token', user.token)
-      // } else {
-      //   toast.error("Thông tin đăng nhập không hợp lệ. Vui lòng thử lại!");
-      // }
 
-      postAPI('http://localhost:8080/user/signin', {  
-        userName: values.userName,
-        passwordUser:values.password
-      }).then((res)=> {
-        const dataLogin = res.data.data
-        dispatch(setUser(dataLogin));
-        localStorage.setItem('roleUser', dataLogin.role)
-        localStorage.setItem('token', dataLogin.token)
-        console.log(dataLogin.role);
-        toast.success('Đăng nhập thành công.')
-        next("/ListUser")
-      }).catch((err) => {
-        console.log(err);
-        toast.error("Thông tin đăng nhập không hợp lệ. Vui lòng thử lại!");
-      })
-    },
+    //   postAPI('http://localhost:8080/user/signin', {  
+    //     userName: values.userName,
+    //     passwordUser:values.password
+    //   }).then((res)=> {
+    //     const dataLogin = res.data.data
+    //     dispatch(setUser(dataLogin));
+    //     localStorage.setItem('roleUser', dataLogin.role)
+    //     localStorage.setItem('token', dataLogin.token)
+    //     console.log(dataLogin.role);
+    //     toast.success('Đăng nhập thành công.')
+    //     next("/ListUser")
+    //   }).catch((err) => {
+    //     console.log(err);
+    //     toast.error("Thông tin đăng nhập không hợp lệ. Vui lòng thử lại!");
+    //   })
+    }
   });
   // console.log(1, dataUser);
   // localStorage.setItem('role', dataUser.role)
