@@ -18,7 +18,12 @@ import { useSelector } from "react-redux";
 import { deleteAPI, getAPI, postAPI } from "../../configs/api";
 
 function ListUser(args) {
-  const fakeData = [
+  const regex =
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/;
+  const RoleUser = localStorage.getItem("roleUser");
+  const dataUser = useSelector((state) => state.user);
+
+  var fakeApi = [
     {
       name: "user1",
       fullName: "user1",
@@ -29,29 +34,26 @@ function ListUser(args) {
     },
     {
       name: "user2",
-      fullName: "user2",
-      email: "user2@gmail.com",
+      fullName: "user1",
+      email: "user1@gmail.com",
       password: "Trung@123",
-      role: "ADMIN",
+      role: "SUPERADMIN",
       id: 1,
     },
     {
       name: "user3",
-      fullName: "user3",
-      email: "user3@gmail.com",
+      fullName: "user1",
+      email: "user1@gmail.com",
       password: "Trung@123",
-      role: "CLIENT",
+      role: "SUPERADMIN",
       id: 2,
     },
   ];
-
-  const RoleUser = localStorage.getItem("roleUser");
-  const dataUser = useSelector((state) => state.user);
-
   const [modal, setModal] = useState(false);
-  const [Data, setData] = useState([]);
+  const [Data, setData] = useState(fakeApi);
   const [proFileUser, setProFileUser] = useState();
   const [selectedRole, setSelectedRole] = useState();
+  const [count, setCount] = useState(0);
   const name = useRef();
   const fullName = useRef();
   const email = useRef();
@@ -68,7 +70,7 @@ function ListUser(args) {
       }
     }
     ListUserData();
-  }, []);
+  }, [count]);
 
   const toggle = () => {
     setModal(!modal);
@@ -99,19 +101,30 @@ function ListUser(args) {
     // toggle();
     // toast.success("Done");
     try {
-      if (name.current.value !== "") {
+      if (name.current.value === "") {
         toast.error("tên không được để trống.");
       }
-      if (fullName.current.value !== "") {
+      if (fullName.current.value === "") {
         toast.error("tên đầy đủ không được để trống.");
       }
-      if (email.current.value !== "") {
+      if (email.current.value === "") {
         toast.error("email không được để trống.");
       }
-      if (password.current.value !== "") {
+      if (password.current.value === "") {
         toast.error("password không được để trống.");
+      } else if (!regex.test(password.current.value)) {
+        toast.error("Định dạng mật khẩu không đúng");
       }
-      await postAPI("", {
+
+      const res = await postAPI("", {
+        userName: name.current.value,
+        fullName: fullName.current.value,
+        email: email.current.value,
+        passwordUser: password.current.value,
+        role: selectedRole,
+      });
+
+      postAPI("", {
         userName: name.current.value,
         fullName: fullName.current.value,
         email: email.current.value,
@@ -120,6 +133,7 @@ function ListUser(args) {
       })
         .then((res) => {
           toast.success("Cập nhật thành công");
+          setCount(count + 1);
         })
         .catch((err) => {
           console.log(err);
@@ -129,10 +143,12 @@ function ListUser(args) {
     }
   };
 
-  function handleDelete() {
+  function handleDelete(itemID) {
+    console.log(">>itemID : ", itemID);
     deleteAPI("")
       .then((res) => {
         toast.success("Xóa thành công ");
+        setCount(count + 1);
       })
       .catch((err) => {
         console.log(err);
@@ -143,7 +159,7 @@ function ListUser(args) {
     toggle();
   };
 
-  const  handleSaveClient = async () => {
+  const handleSaveClient = async () => {
     // const updatedUser = {
     //   name: name.current.value,
     //   fullName: fullName.current.value,
@@ -158,13 +174,13 @@ function ListUser(args) {
     // setData(updatedData);
     // toast.success("Done");
     try {
-      if (name.current.value !== "") {
+      if (name.current.value === "") {
         toast.error("tên không được để trống.");
       }
-      if (fullName.current.value !== "") {
+      if (fullName.current.value === "") {
         toast.error("tên đầy đủ không được để trống.");
       }
-      if (email.current.value !== "") {
+      if (email.current.value === "") {
         toast.error("email không được để trống.");
       }
       postAPI("", {
@@ -174,14 +190,15 @@ function ListUser(args) {
       })
         .then((res) => {
           toast.success("thay đổi thành công. ");
+          setCount(count + 1);
         })
         .catch((err) => {
           console.log(err);
         });
     } catch (error) {
-      toast.error('thay đổi thất bại. ')
+      toast.error("thay đổi thất bại. ");
     }
-  }
+  };
 
   return (
     <div>
@@ -195,7 +212,7 @@ function ListUser(args) {
                   <tr>
                     <td>Name</td>
                     <td>
-                      <input defaultValue={proFileUser?.name} ref={name} />
+                      <input defaultValue={proFileUser?.userName} ref={name} />
                     </td>
                   </tr>
                   <tr>
@@ -210,12 +227,19 @@ function ListUser(args) {
                   <tr>
                     <td>Email</td>
                     <td>
+                      <input
+                        type="email"
+                        defaultValue={proFileUser?.email}
+                        ref={email}
+                      />
                       <input defaultValue={proFileUser?.email} ref={email} />
                     </td>
                   </tr>
                   <tr
                     className={`${
-                      RoleUser === "ROLE_SUPERADMIN" ? "canUpdate" : "cantUpdate"
+                      RoleUser === "ROLE_SUPERADMIN"
+                        ? "canUpdate"
+                        : "cantUpdate"
                     }`}
                   >
                     <td>Password</td>
@@ -228,7 +252,9 @@ function ListUser(args) {
                   </tr>
                   <tr
                     className={`${
-                      RoleUser === "ROLE_SUPERADMIN" ? "canUpdate" : "cantUpdate"
+                      RoleUser === "ROLE_SUPERADMIN"
+                        ? "canUpdate"
+                        : "cantUpdate"
                     }`}
                   >
                     <td>Role</td>
@@ -237,9 +263,9 @@ function ListUser(args) {
                         value={selectedRole}
                         onChange={(e) => setSelectedRole(e.target.value)}
                       >
-                        <option value="ROLE_SUPERADMIN">SUPER ADMIN</option>
-                        <option value="ROLE_ADMIN">ADMIN</option>
-                        <option value="ROLE_CLIENT">CLIENT</option>
+                        <option value="SUPERADMIN">SUPER ADMIN</option>
+                        <option value="ADMIN">ADMIN</option>
+                        <option value="CLIENT">CLIENT</option>
                       </select>
                     </td>
                   </tr>
@@ -285,7 +311,10 @@ function ListUser(args) {
                           <FontAwesomeIcon icon={faPenToSquare} />
                         </button>
                         {RoleUser === "ROLE_SUPERADMIN" && (
-                          <button className="btn-open" onClick={handleDelete}>
+                          <button
+                            className="btn-open"
+                            onClick={() => handleDelete(item?.id)}
+                          >
                             <FontAwesomeIcon icon={faDeleteLeft} />
                           </button>
                         )}
@@ -298,14 +327,14 @@ function ListUser(args) {
           </>
         )}
         {RoleUser === "ROLE_CLIENT" && (
-          <div>
+          <div className="client-box">
             <p>Profile {`${dataUser?.name}`}</p>
             <div className="profile-client">
               <table>
                 <tr>
                   <td>Name</td>
                   <td>
-                    <input defaultValue={dataUser?.name} ref={name} />
+                    <input defaultValue={dataUser?.userName} ref={name} />
                   </td>
                 </tr>
                 <tr>
@@ -329,7 +358,7 @@ function ListUser(args) {
         )}
         <ToastContainer
           position="top-right"
-          autoClose={500}
+          autoClose={3000}
           hideProgressBar={false}
           newestOnTop={false}
           closeOnClick

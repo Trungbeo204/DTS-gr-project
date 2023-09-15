@@ -20,12 +20,12 @@ function Login() {
 
   const formik = useFormik({
     initialValues: {
-      email: "",
-      password: "",
+      userName: "",
+      passWordUser: "",
     },
     validationSchema: yup.object().shape({
-      email: yup.string().email("email không hợp lệ").required("bắt buộc"),
-      password: yup
+      userName: yup.string().required("bắt buộc"),
+      passWordUser: yup
         .string()
         .min(8)
         .matches(
@@ -35,24 +35,23 @@ function Login() {
         .required("bắt buộc"),
     }),
     onSubmit: (values) => {
-      console.log(1);
-
-    //   postAPI('http://localhost:8080/user/signin', {  
-    //     userName: values.userName,
-    //     passwordUser:values.password
-    //   }).then((res)=> {
-    //     const dataLogin = res.data.data
-    //     dispatch(setUser(dataLogin));
-    //     localStorage.setItem('roleUser', dataLogin.role)
-    //     localStorage.setItem('token', dataLogin.token)
-    //     console.log(dataLogin.role);
-    //     toast.success('Đăng nhập thành công.')
-    //     next("/ListUser")
-    //   }).catch((err) => {
-    //     console.log(err);
-    //     toast.error("Thông tin đăng nhập không hợp lệ. Vui lòng thử lại!");
-    //   })
-    }
+      console.log(values);
+      postAPI('http://localhost:8080/user/signin', {  
+        userName: values.userName,
+        passWordUser:values.passWordUser
+      }).then((res)=> {
+        dispatch(setUser(res.data.data));
+        console.log(res);
+        const dataLogin = res.data.data
+        localStorage.setItem('token', dataLogin.token)
+        localStorage.setItem('roleUser', dataLogin.role)
+        toast.success('Đăng nhập thành công.')
+        next("/ListUser")
+      }).catch((err) => {
+        console.log(err);
+        toast.error("Thông tin đăng nhập không chính xác. Vui lòng thử lại!");
+      })
+    },
   });
   // console.log(1, dataUser);
   // localStorage.setItem('role', dataUser.role)
@@ -71,7 +70,7 @@ function Login() {
               <TextField
                 id="userName"
                 name="userName"
-                label="userName"
+                label="Tên đăng nhập"
                 type="text"
                 fullWidth
                 margin="normal"

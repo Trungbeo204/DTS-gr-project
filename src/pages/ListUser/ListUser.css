@@ -39,6 +39,8 @@
 .profile-client table tr td input {
   border: none;
   outline: none;
+  background-color: rgba(0, 0, 0, 0);
+  width: 100%;  
 }
 .btn-save{
   margin-top: 5%;
@@ -47,4 +49,6 @@
   width: max-content;
   padding: 0 3%;
   border-radius: 8px;
+  position: relative;
+  left: 91.5%;
 }
