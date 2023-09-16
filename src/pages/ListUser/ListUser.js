@@ -16,7 +16,7 @@ import { faDeleteLeft, faPenToSquare } from "@fortawesome/free-solid-svg-icons";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useSelector } from "react-redux";
-import { deleteAPI, getAPI, postAPI } from "../../configs/api";
+import { deleteAPI, getAPI, postAPI, postAPItoken } from "../../configs/api";
 
 function ListUser(args) {
   const regex =
@@ -62,7 +62,7 @@ function ListUser(args) {
     setSelectedRole(role);
   }
 
-  const handleSave = async () => {
+  const handleSave = async (id) => {
     try {
       if (name.current.value === "") {
         toast.error("tên không được để trống.");
@@ -81,12 +81,10 @@ function ListUser(args) {
         toast.error("Định dạng mật khẩu không đúng.");
       }
 
-      postAPI("", {
-        userName: name.current.value,
+      await postAPItoken(`http://localhost:8080/user/auth/update/${id}`, {
+        nameUser: name.current.value,
         fullName: fullName.current.value,
         email: email.current.value,
-        passWordUser: password.current.value,
-        role: selectedRole,
       })
         .then((res) => {
           toast.success("Cập nhật thành công");
@@ -212,9 +210,9 @@ function ListUser(args) {
                         value={selectedRole}
                         onChange={(e) => setSelectedRole(e.target.value)}
                       >
-                        <option value="SUPERADMIN">SUPER ADMIN</option>
-                        <option value="ADMIN">ADMIN</option>
-                        <option value="CLIENT">CLIENT</option>
+                        <option value="3">SUPER ADMIN</option>
+                        <option value="2">ADMIN</option>
+                        <option value="1">CLIENT</option>
                       </select>
                     </td>
                   </tr>
@@ -223,7 +221,7 @@ function ListUser(args) {
             </div>
           </ModalBody>
           <ModalFooter>
-            <Button color="primary" onClick={handleSave}>
+            <Button color="primary" onClick={() => handleSave(proFileUser?.id)}>
               Save
             </Button>
             <Button color="secondary" onClick={handleCancel}>
@@ -256,7 +254,13 @@ function ListUser(args) {
                       <td>
                         <button
                           onClick={() => handleOpenEdit(item?.id, item?.role)}
-                          className="btn-open"
+                          // className="btn-open"
+                          className={`${
+                            // RoleUser === "ROLE_SUPERADMIN"
+                            dataUser.idRole > item?.idRole
+                              ? "btn-open"
+                              : "cantUpdate"
+                          }`}
                         >
                           <FontAwesomeIcon icon={faPenToSquare} />
                         </button>
