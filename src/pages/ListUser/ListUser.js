@@ -15,14 +15,19 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faDeleteLeft, faPenToSquare } from "@fortawesome/free-solid-svg-icons";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+<<<<<<< HEAD
 import { useSelector } from "react-redux";
 import { deleteAPI, getAPI, postAPI, postAPItoken } from "../../configs/api";
+=======
+import { useDispatch, useSelector } from "react-redux";
+import { deleteAPI, getAPI, postAPI, postAPItoken } from "../../configs/api";
+import { setUser } from "../../reducer/userProfile";
+>>>>>>> e090da1fcf7ddfb42806e9f35f4b08928f62377d
 
 function ListUser(args) {
-  const regex =
-    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/;
   const regexEmail = /^([a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6})*$/;
   const RoleUser = localStorage.getItem("roleUser");
+  const idRole = localStorage.getItem('idRole')
   const dataUser = useSelector((state) => state.user);
 
   const [modal, setModal] = useState(false);
@@ -34,10 +39,11 @@ function ListUser(args) {
   const fullName = useRef();
   const email = useRef();
   const password = useRef();
-  const next = useNavigate()
+  const next = useNavigate();
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    if (RoleUser === 'ROLE_SUPERADMIN' || RoleUser === 'ROLE_ADMIN') {
+    if (RoleUser === "ROLE_SUPERADMIN" || RoleUser === "ROLE_ADMIN") {
       async function ListUserData() {
         try {
           const response = await getAPI("http://localhost:8080/user/auth/all");
@@ -66,6 +72,10 @@ function ListUser(args) {
   }
 
   const handleSave = async (id) => {
+<<<<<<< HEAD
+=======
+    try {
+>>>>>>> e090da1fcf7ddfb42806e9f35f4b08928f62377d
       if (name.current.value === "") {
         toast.error("tên không được để trống.");
       } else if (fullName.current.value === "") {
@@ -73,6 +83,7 @@ function ListUser(args) {
       }else if (email.current.value === "") {
         toast.error("email không được để trống.");
       } else if (!regexEmail.test(email.current.value)) {
+<<<<<<< HEAD
         toast.error('không đúng định dạng email.')
       }else {
           const response = await postAPItoken(`http://localhost:8080/user/auth/update/${id}`, {
@@ -93,6 +104,26 @@ function ListUser(args) {
             toggle()
           
       
+=======
+        toast.error("không đúng định dạng email.");
+      }
+
+      await postAPItoken(`http://localhost:8080/user/auth/update/${id}`, {
+        nameUser: name.current.value,
+        fullName: fullName.current.value,
+        email: email.current.value,
+      })
+        .then((res) => {
+          toast.success("Cập nhật thành công");
+          setCount(count + 1);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    } catch (error) {
+      toast.error("Cập nhật thất bại");
+    }
+>>>>>>> e090da1fcf7ddfb42806e9f35f4b08928f62377d
   };
 
   function handleDelete(itemID) {
@@ -111,8 +142,13 @@ function ListUser(args) {
     toggle();
   };
 
+<<<<<<< HEAD
   const handleSaveClient = async (id) => {
     try {  
+=======
+  const handleSaveClient = async () => {
+    try {
+>>>>>>> e090da1fcf7ddfb42806e9f35f4b08928f62377d
       if (name.current.value === "") {
         toast.error("tên không được để trống.");
       }
@@ -122,6 +158,7 @@ function ListUser(args) {
       if (email.current.value === "") {
         toast.error("email không được để trống.");
       }
+<<<<<<< HEAD
       const response = await postAPItoken(`http://localhost:8080/user/auth/update/${id}`, {
       nameUser: name.current.value,
       fullName: fullName.current.value,
@@ -138,14 +175,28 @@ function ListUser(args) {
       toast.error(data.message || "Cập nhật thất bại");
     }
 
+=======
+      postAPI("", {
+        nameUser: name.current.value,
+        fullName: fullName.current.value,
+        email: email.current.value,
+      })
+        .then((res) => {
+          dispatch(setUser(res));
+          toast.success("thay đổi thành công. ");
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+>>>>>>> e090da1fcf7ddfb42806e9f35f4b08928f62377d
     } catch (error) {
       toast.error("thay đổi thất bại. ");
     }
   };
 
   function handleLogout() {
-    localStorage.removeItem('token')
-    next('/Login')
+    localStorage.removeItem("token");
+    next("/Login");
   }
 
   return (
@@ -195,9 +246,9 @@ function ListUser(args) {
                         value={selectedRole}
                         onChange={(e) => setSelectedRole(e.target.value)}
                       >
-                        <option value="SUPERADMIN">SUPER ADMIN</option>
-                        <option value="ADMIN">ADMIN</option>
-                        <option value="CLIENT">CLIENT</option>
+                        <option value="3">SUPER ADMIN</option>
+                        <option value="2">ADMIN</option>
+                        <option value="1">CLIENT</option>
                       </select>
                     </td>
                   </tr>
@@ -239,7 +290,13 @@ function ListUser(args) {
                       <td>
                         <button
                           onClick={() => handleOpenEdit(item?.id, item?.role)}
-                          className="btn-open"
+                          // className="btn-open"
+                          className={`${
+                            // RoleUser === "ROLE_SUPERADMIN"
+                            idRole > item?.idRole
+                              ? "btn-open"
+                              : "cantUpdate"
+                          }`}
                         >
                           <FontAwesomeIcon icon={faPenToSquare} />
                         </button>
