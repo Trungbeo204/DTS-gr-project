@@ -16,7 +16,7 @@ import { faDeleteLeft, faPenToSquare } from "@fortawesome/free-solid-svg-icons";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useSelector } from "react-redux";
-import { deleteAPI, getAPI, postAPI } from "../../configs/api";
+import { deleteAPI, getAPI, postAPI, postAPItoken } from "../../configs/api";
 
 function ListUser(args) {
   const regex =
@@ -42,7 +42,7 @@ function ListUser(args) {
         try {
           const response = await getAPI("http://localhost:8080/user/auth/all");
           console.log(2);
-          const data = response.data;
+          const data = response.data.data;
           setData(data);
         } catch (error) {
           console.error(">>err :", error);
@@ -51,6 +51,8 @@ function ListUser(args) {
       ListUserData();
     }
   }, [RoleUser, count]);
+
+  console.log(Data);
 
   const toggle = () => {
     setModal(!modal);
@@ -63,42 +65,34 @@ function ListUser(args) {
     setSelectedRole(role);
   }
 
-  const handleSave = async () => {
-    try {
+  const handleSave = async (id) => {
       if (name.current.value === "") {
         toast.error("tên không được để trống.");
-      }
-      if (fullName.current.value === "") {
+      } else if (fullName.current.value === "") {
         toast.error("tên đầy đủ không được để trống.");
-      }
-      if (email.current.value === "") {
+      }else if (email.current.value === "") {
         toast.error("email không được để trống.");
       } else if (!regexEmail.test(email.current.value)) {
         toast.error('không đúng định dạng email.')
-      }
-      if (password.current.value === "") {
-        toast.error("password không được để trống.");
-      } else if (!regex.test(password.current.value)) {
-        toast.error("Định dạng mật khẩu không đúng.");
-      }
+      }else {
+          const response = await postAPItoken(`http://localhost:8080/user/auth/update/${id}`, {
+              nameUser: name.current.value,
+              fullName: fullName.current.value,
+              email: email.current.value,
+              })
+        
+              if (response.status === 200) {
+                toast.success("Cập nhật thành công");
+                setCount(count + 1);
+              } else {
+                const data = await response.json();
+                toast.error(data.message || "Cập nhật thất bại");
+              }
+            }
 
-      postAPI("", {
-        userName: name.current.value,
-        fullName: fullName.current.value,
-        email: email.current.value,
-        passWordUser: password.current.value,
-        role: selectedRole,
-      })
-        .then((res) => {
-          toast.success("Cập nhật thành công");
-          setCount(count + 1);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    } catch (error) {
-      toast.error("Cập nhật thất bại");
-    }
+            toggle()
+          
+      
   };
 
   function handleDelete(itemID) {
@@ -117,7 +111,7 @@ function ListUser(args) {
     toggle();
   };
 
-  const handleSaveClient = async () => {
+  const handleSaveClient = async (id) => {
     try {  
       if (name.current.value === "") {
         toast.error("tên không được để trống.");
@@ -128,18 +122,22 @@ function ListUser(args) {
       if (email.current.value === "") {
         toast.error("email không được để trống.");
       }
-      postAPI("", {
-        nameUser: name.current.value,
-        fullName: fullName.current.value,
-        email: email.current.value,
-      })
-        .then((res) => {
-          toast.success("thay đổi thành công. ");
-          setCount(count + 1);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+      const response = await postAPItoken(`http://localhost:8080/user/auth/update/${id}`, {
+      nameUser: name.current.value,
+      fullName: fullName.current.value,
+      email: email.current.value,
+      // passWordUser: password.current.value,
+      // role: selectedRole,
+    });
+
+    if (response.status === 200) {
+      toast.success("Cập nhật thành công");
+      setCount(count + 1);
+    } else {
+      const data = await response.json();
+      toast.error(data.message || "Cập nhật thất bại");
+    }
+
     } catch (error) {
       toast.error("thay đổi thất bại. ");
     }
@@ -162,7 +160,7 @@ function ListUser(args) {
                   <tr>
                     <td>Name</td>
                     <td>
-                      <input defaultValue={proFileUser?.userName} ref={name} />
+                      <input defaultValue={proFileUser?.nameUser} ref={name} />
                     </td>
                   </tr>
                   <tr>
@@ -181,22 +179,6 @@ function ListUser(args) {
                         type="email"
                         defaultValue={proFileUser?.email}
                         ref={email}
-                      />
-                      <input defaultValue={proFileUser?.email} ref={email} />
-                    </td>
-                  </tr>
-                  <tr
-                    className={`${
-                      RoleUser === "ROLE_SUPERADMIN"
-                        ? "canUpdate"
-                        : "cantUpdate"
-                    }`}
-                  >
-                    <td>Password</td>
-                    <td>
-                      <input
-                        defaultValue={proFileUser?.passWordUser}
-                        ref={password}
                       />
                     </td>
                   </tr>
@@ -224,15 +206,15 @@ function ListUser(args) {
             </div>
           </ModalBody>
           <ModalFooter>
-            <Button color="primary" onClick={handleSave}>
+            <Button color="primary" onClick={() => handleSave(proFileUser?.id)}>
               Save
             </Button>
             <Button color="secondary" onClick={handleCancel}>
               Cancel
             </Button>
           </ModalFooter>
-          <button onClick={handleLogout}> Log out</button>
         </Modal>
+          <button onClick={handleLogout}> Log out</button>
         {(RoleUser === "ROLE_SUPERADMIN" || RoleUser === "ROLE_ADMIN") && (
           <>
             <h1>List User</h1>
@@ -248,9 +230,9 @@ function ListUser(args) {
               </thead>
               {Data.map((item, index) => {
                 return (
-                  <tbody className="table-body">
+                  <tbody key={index} className="table-body">
                     <tr>
-                      <th>{item.userName}</th>
+                      <th>{item.nameUser}</th>
                       <td>{item.fullName}</td>
                       <td>{item.email}</td>
                       <td>{item.role}</td>

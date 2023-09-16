@@ -5,6 +5,10 @@ export const getAPI = function(url){
     return axios.get(url, {headers: {'Authorization': 'Bearer ' +  token}})
 }
 export const postAPI = function(url, data){
+    return axios.post(url,data)
+}
+export const postAPItoken = function(url, data){
+    // return axios.post(url,data)
     return axios.post(url,data, {headers: {'Authorization': 'Bearer ' +  token}})
 }
 export const patchAPI = function(url, data){
