@@ -20,10 +20,9 @@ import { deleteAPI, getAPI, postAPI, postAPItoken } from "../../configs/api";
 import { setUser } from "../../reducer/userProfile";
 
 function ListUser(args) {
-  const regex =
-    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/;
   const regexEmail = /^([a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6})*$/;
   const RoleUser = localStorage.getItem("roleUser");
+  const idRole = localStorage.getItem('idRole')
   const dataUser = useSelector((state) => state.user);
 
   const [modal, setModal] = useState(false);
@@ -129,7 +128,7 @@ function ListUser(args) {
       })
         .then((res) => {
           dispatch(setUser(res));
-          toast.success("thay đổi thành công. ");   
+          toast.success("thay đổi thành công. ");
         })
         .catch((err) => {
           console.log(err);
@@ -254,7 +253,7 @@ function ListUser(args) {
                           // className="btn-open"
                           className={`${
                             // RoleUser === "ROLE_SUPERADMIN"
-                            dataUser.idRole > item?.idRole
+                            idRole > item?.idRole
                               ? "btn-open"
                               : "cantUpdate"
                           }`}
