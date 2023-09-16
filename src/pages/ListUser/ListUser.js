@@ -75,11 +75,6 @@ function ListUser(args) {
       } else if (!regexEmail.test(email.current.value)) {
         toast.error('không đúng định dạng email.')
       }
-      if (password.current.value === "") {
-        toast.error("password không được để trống.");
-      } else if (!regex.test(password.current.value)) {
-        toast.error("Định dạng mật khẩu không đúng.");
-      }
 
       await postAPItoken(`http://localhost:8080/user/auth/update/${id}`, {
         nameUser: name.current.value,
