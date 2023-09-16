@@ -15,8 +15,9 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faDeleteLeft, faPenToSquare } from "@fortawesome/free-solid-svg-icons";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { deleteAPI, getAPI, postAPI, postAPItoken } from "../../configs/api";
+import { setUser } from "../../reducer/userProfile";
 
 function ListUser(args) {
   const regex =
@@ -34,10 +35,11 @@ function ListUser(args) {
   const fullName = useRef();
   const email = useRef();
   const password = useRef();
-  const next = useNavigate()
+  const next = useNavigate();
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    if (RoleUser === 'ROLE_SUPERADMIN' || RoleUser === 'ROLE_ADMIN') {
+    if (RoleUser === "ROLE_SUPERADMIN" || RoleUser === "ROLE_ADMIN") {
       async function ListUserData() {
         try {
           const response = await getAPI("");
@@ -73,7 +75,7 @@ function ListUser(args) {
       if (email.current.value === "") {
         toast.error("email không được để trống.");
       } else if (!regexEmail.test(email.current.value)) {
-        toast.error('không đúng định dạng email.')
+        toast.error("không đúng định dạng email.");
       }
 
       await postAPItoken(`http://localhost:8080/user/auth/update/${id}`, {
@@ -110,7 +112,7 @@ function ListUser(args) {
   };
 
   const handleSaveClient = async () => {
-    try {  
+    try {
       if (name.current.value === "") {
         toast.error("tên không được để trống.");
       }
@@ -126,8 +128,8 @@ function ListUser(args) {
         email: email.current.value,
       })
         .then((res) => {
-          toast.success("thay đổi thành công. ");
-          setCount(count + 1);
+          dispatch(setUser(res));
+          toast.success("thay đổi thành công. ");   
         })
         .catch((err) => {
           console.log(err);
@@ -138,8 +140,8 @@ function ListUser(args) {
   };
 
   function handleLogout() {
-    localStorage.removeItem('token')
-    next('/Login')
+    localStorage.removeItem("token");
+    next("/Login");
   }
 
   return (
