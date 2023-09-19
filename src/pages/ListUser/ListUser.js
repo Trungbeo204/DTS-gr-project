@@ -15,14 +15,9 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faDeleteLeft, faPenToSquare } from "@fortawesome/free-solid-svg-icons";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-<<<<<<< HEAD
-import { useSelector } from "react-redux";
-import { deleteAPI, getAPI, postAPI, postAPItoken } from "../../configs/api";
-=======
 import { useDispatch, useSelector } from "react-redux";
 import { deleteAPI, getAPI, postAPI, postAPItoken } from "../../configs/api";
 import { setUser } from "../../reducer/userProfile";
->>>>>>> e090da1fcf7ddfb42806e9f35f4b08928f62377d
 
 function ListUser(args) {
   const regexEmail = /^([a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6})*$/;
@@ -33,21 +28,28 @@ function ListUser(args) {
   const [modal, setModal] = useState(false);
   const [Data, setData] = useState([]);
   const [proFileUser, setProFileUser] = useState();
-  const [selectedRole, setSelectedRole] = useState();
+  const [roleTitle, setRoleTitle] = useState([])
+  const [selectedRole, setSelectedRole] = useState(proFileUser?.role);
   const [count, setCount] = useState(0);
   const name = useRef();
   const fullName = useRef();
   const email = useRef();
-  const password = useRef();
+  // const password = useRef();
   const next = useNavigate();
   const dispatch = useDispatch();
+  const roleData = []
+
+  const roleEnum = [
+    {id : 3,roleName: 'ROLE_SUPERADMIN'},
+    {id: 2, roleName: 'ROLE_ADMIN'},
+    {id: 3, roleName: 'ROLE_CLIENT'}
+  ]
 
   useEffect(() => {
     if (RoleUser === "ROLE_SUPERADMIN" || RoleUser === "ROLE_ADMIN") {
       async function ListUserData() {
         try {
           const response = await getAPI("http://localhost:8080/user/auth/all");
-          console.log(2);
           const data = response.data.data;
           setData(data);
         } catch (error) {
@@ -58,8 +60,6 @@ function ListUser(args) {
     }
   }, [RoleUser, count]);
 
-  console.log(Data);
-
   const toggle = () => {
     setModal(!modal);
   };
@@ -67,15 +67,20 @@ function ListUser(args) {
   function handleOpenEdit(a, role) {
     toggle();
     const infor = Data.find((i) => i.id === a);
+    for (let index = 0; index < roleEnum.length; index++) {
+      if (role !== roleEnum[index].roleName) {
+        roleData.push(roleEnum[index])
+      }
+    }
+    setRoleTitle(roleData)
     setProFileUser(infor);
     setSelectedRole(role);
   }
 
+  console.log(proFileUser);
+
   const handleSave = async (id) => {
-<<<<<<< HEAD
-=======
     try {
->>>>>>> e090da1fcf7ddfb42806e9f35f4b08928f62377d
       if (name.current.value === "") {
         toast.error("tên không được để trống.");
       } else if (fullName.current.value === "") {
@@ -83,39 +88,19 @@ function ListUser(args) {
       }else if (email.current.value === "") {
         toast.error("email không được để trống.");
       } else if (!regexEmail.test(email.current.value)) {
-<<<<<<< HEAD
-        toast.error('không đúng định dạng email.')
-      }else {
-          const response = await postAPItoken(`http://localhost:8080/user/auth/update/${id}`, {
-              nameUser: name.current.value,
-              fullName: fullName.current.value,
-              email: email.current.value,
-              })
-        
-              if (response.status === 200) {
-                toast.success("Cập nhật thành công");
-                setCount(count + 1);
-              } else {
-                const data = await response.json();
-                toast.error(data.message || "Cập nhật thất bại");
-              }
-            }
-
-            toggle()
-          
-      
-=======
         toast.error("không đúng định dạng email.");
       }
 
-      await postAPItoken(`http://localhost:8080/user/auth/update/${id}`, {
-        nameUser: name.current.value,
+      await postAPItoken(`http://localhost:8080/user/auth/updateAll/${id}`, {
+        userName: name.current.value,
         fullName: fullName.current.value,
         email: email.current.value,
+        idRole: selectedRole
       })
         .then((res) => {
           toast.success("Cập nhật thành công");
           setCount(count + 1);
+          toggle()
         })
         .catch((err) => {
           console.log(err);
@@ -123,11 +108,9 @@ function ListUser(args) {
     } catch (error) {
       toast.error("Cập nhật thất bại");
     }
->>>>>>> e090da1fcf7ddfb42806e9f35f4b08928f62377d
   };
 
   function handleDelete(itemID) {
-    console.log(">>itemID : ", itemID);
     deleteAPI("")
       .then((res) => {
         toast.success("Xóa thành công ");
@@ -142,13 +125,8 @@ function ListUser(args) {
     toggle();
   };
 
-<<<<<<< HEAD
-  const handleSaveClient = async (id) => {
-    try {  
-=======
   const handleSaveClient = async () => {
     try {
->>>>>>> e090da1fcf7ddfb42806e9f35f4b08928f62377d
       if (name.current.value === "") {
         toast.error("tên không được để trống.");
       }
@@ -158,24 +136,6 @@ function ListUser(args) {
       if (email.current.value === "") {
         toast.error("email không được để trống.");
       }
-<<<<<<< HEAD
-      const response = await postAPItoken(`http://localhost:8080/user/auth/update/${id}`, {
-      nameUser: name.current.value,
-      fullName: fullName.current.value,
-      email: email.current.value,
-      // passWordUser: password.current.value,
-      // role: selectedRole,
-    });
-
-    if (response.status === 200) {
-      toast.success("Cập nhật thành công");
-      setCount(count + 1);
-    } else {
-      const data = await response.json();
-      toast.error(data.message || "Cập nhật thất bại");
-    }
-
-=======
       postAPI("", {
         nameUser: name.current.value,
         fullName: fullName.current.value,
@@ -188,7 +148,6 @@ function ListUser(args) {
         .catch((err) => {
           console.log(err);
         });
->>>>>>> e090da1fcf7ddfb42806e9f35f4b08928f62377d
     } catch (error) {
       toast.error("thay đổi thất bại. ");
     }
@@ -246,9 +205,11 @@ function ListUser(args) {
                         value={selectedRole}
                         onChange={(e) => setSelectedRole(e.target.value)}
                       >
-                        <option value="3">SUPER ADMIN</option>
-                        <option value="2">ADMIN</option>
-                        <option value="1">CLIENT</option>
+                        <option value={`${selectedRole}`}>{selectedRole}</option>
+                        {roleTitle.map((item, index) =>{
+                          return(
+                          <option value={`${item?.id}`} key={index}>{item?.roleName}</option>)
+                        })}
                       </select>
                     </td>
                   </tr>
@@ -290,13 +251,13 @@ function ListUser(args) {
                       <td>
                         <button
                           onClick={() => handleOpenEdit(item?.id, item?.role)}
-                          // className="btn-open"
-                          className={`${
-                            // RoleUser === "ROLE_SUPERADMIN"
-                            idRole > item?.idRole
-                              ? "btn-open"
-                              : "cantUpdate"
-                          }`}
+                          className="btn-open"
+                          // className={`${
+                          //   // RoleUser === "ROLE_SUPERADMIN"
+                          //   idRole > item?.idRole
+                          //     ? "btn-open"
+                          //     : "cantUpdate"
+                          // }`}
                         >
                           <FontAwesomeIcon icon={faPenToSquare} />
                         </button>

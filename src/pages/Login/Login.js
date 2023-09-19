@@ -12,7 +12,6 @@ import { useDispatch } from "react-redux";
 import { postAPI } from "../../configs/api";
 
 function Login() {
-  const [idRole, setIdRole] = useState();
   const next = useNavigate();
   const dispatch = useDispatch();
 
@@ -42,26 +41,9 @@ function Login() {
         .required("bắt buộc"),
     }),
     onSubmit: (values) => {
-<<<<<<< HEAD
-      postAPI('http://localhost:8080/user/signin', {  
+      postAPI("http://localhost:8080/user/signin", {
         userName: values.userName,
-        passWordUser:values.passWordUser
-      }).then((res)=> {
-        dispatch(setUser(res.data.data));
-        console.log(res);
-        const dataLogin = res.data.data
-        localStorage.setItem('token', dataLogin.token)
-        localStorage.setItem('roleUser', dataLogin.role)
-        toast.success('Đăng nhập thành công.')
-        next("/ListUser")
-      }).catch((err) => {
-        console.log(err);
-        toast.error("Thông tin đăng nhập không chính xác. Vui lòng thử lại!");
-=======
-      postAPI("", {
-        userName: values.userName,
-        passWordUser: values.password,
->>>>>>> e090da1fcf7ddfb42806e9f35f4b08928f62377d
+        passWordUser: values.passWordUser,
       })
         .then((res) => {
           dispatch(setUser(res.data.data));
@@ -69,7 +51,7 @@ function Login() {
           localStorage.setItem("token", dataLogin.token);
           localStorage.setItem("roleUser", dataLogin.role);
           const idRole = roleEnum.find((i) => i.role === dataLogin?.role);
-          localStorage.setItem('idRole', idRole)
+          localStorage.setItem('idRole', idRole.id)
           toast.success("Đăng nhập thành công.");
           next("/ListUser");
         })
