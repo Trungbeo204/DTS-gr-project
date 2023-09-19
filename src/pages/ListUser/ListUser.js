@@ -22,10 +22,10 @@ import { setUser } from "../../reducer/userProfile";
 function ListUser(args) {
   const regexEmail = /^([a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6})*$/;
   const RoleUser = localStorage.getItem("roleUser");
-  const idRole = localStorage.getItem('idRole')
   const dataUser = useSelector((state) => state.user);
 
   const [modal, setModal] = useState(false);
+  const [modalDelete, setModalDelete] = useState(false);
   const [Data, setData] = useState([]);
   const [proFileUser, setProFileUser] = useState();
   const [selectedRole, setSelectedRole] = useState();
@@ -56,11 +56,32 @@ function ListUser(args) {
     setModal(!modal);
   };
 
+  const toggleDelete = () => {
+    setModalDelete(!modalDelete);
+  };
+
+  const externalCloseBtn = (
+    <button
+      type="button"
+      className="close"
+      // style={{ position: 'absolute', top: '150px', right: '15px' }}
+      onClick={toggleDelete}
+    >
+      &times;
+    </button>
+  );
+
   function handleOpenEdit(a, role) {
     toggle();
     const infor = Data.find((i) => i.id === a);
     setProFileUser(infor);
     setSelectedRole(role);
+  }
+
+  function handleOpenDelete(itemID) {
+    toggleDelete()
+    const infor = Data.find((i) => i.id === itemID);
+    setProFileUser(infor);
   }
 
   const handleSave = async (id) => {
@@ -94,8 +115,8 @@ function ListUser(args) {
     }
   };
 
-  function handleDelete(itemID) {
-    console.log(">>itemID : ", itemID);
+  function handleDelete() {
+    console.log(">>itemID : ", proFileUser?.id);
     deleteAPI("")
       .then((res) => {
         toast.success("Xóa thành công ");
@@ -104,6 +125,7 @@ function ListUser(args) {
       .catch((err) => {
         console.log(err);
       });
+    toggleDelete()
   }
 
   const handleCancel = () => {
@@ -224,8 +246,25 @@ function ListUser(args) {
               Cancel
             </Button>
           </ModalFooter>
-          <button onClick={handleLogout}> Log out</button>
         </Modal>
+
+        <div>
+          <Modal isOpen={modalDelete} toggle={toggleDelete} className="delete-box">
+            <ModalHeader toggle={toggleDelete} external={externalCloseBtn}>
+              Xóa User {`${proFileUser?.userName}`}
+            </ModalHeader>
+            <ModalBody>Bạn chắc chắn muốn xóa user ?</ModalBody>
+            <ModalFooter>
+              <Button color="danger" onClick={handleDelete}>
+                Delete
+              </Button>{" "}
+              <Button color="secondary" onClick={toggleDelete}>
+                Cancel
+              </Button>
+            </ModalFooter>
+          </Modal>
+        </div>
+
         {(RoleUser === "ROLE_SUPERADMIN" || RoleUser === "ROLE_ADMIN") && (
           <>
             <h1>List User</h1>
@@ -250,20 +289,20 @@ function ListUser(args) {
                       <td>
                         <button
                           onClick={() => handleOpenEdit(item?.id, item?.role)}
-                          // className="btn-open"
-                          className={`${
-                            // RoleUser === "ROLE_SUPERADMIN"
-                            idRole > item?.idRole
-                              ? "btn-open"
-                              : "cantUpdate"
-                          }`}
+                          className="btn-open"
+                          // className={`${
+                          //   // RoleUser === "ROLE_SUPERADMIN"
+                          //   idRole > item?.idRole
+                          //     ? "btn-open"
+                          //     : "cantUpdate"
+                          // }`}
                         >
                           <FontAwesomeIcon icon={faPenToSquare} />
                         </button>
                         {RoleUser === "ROLE_SUPERADMIN" && (
                           <button
                             className="btn-open"
-                            onClick={() => handleDelete(item?.id)}
+                            onClick={() => handleOpenDelete(item?.id)}
                           >
                             <FontAwesomeIcon icon={faDeleteLeft} />
                           </button>
@@ -306,6 +345,10 @@ function ListUser(args) {
             </button>
           </div>
         )}
+        <button onClick={handleLogout} className="btn-logOut">
+          {" "}
+          Log out
+        </button>
         <ToastContainer
           position="top-right"
           autoClose={3000}
