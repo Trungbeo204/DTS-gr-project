@@ -29,7 +29,7 @@ function ListUser(args) {
 
   const [modal, setModal] = useState(false);
   const [modalDelete, setModalDelete] = useState(false);
-  const [Data, setData] = useState([]);
+  // const [Data, setData] = useState([]);
   const [proFileUser, setProFileUser] = useState();
   const [roleTitle, setRoleTitle] = useState([]);
   const [selectedRole, setSelectedRole] = useState(proFileUser?.role);
@@ -47,25 +47,49 @@ function ListUser(args) {
     { id: 3, roleName: "ROLE_CLIENT" },
   ];
 
-  useEffect(() => {
-    if (RoleUser === "ROLE_SUPERADMIN" || RoleUser === "ROLE_ADMIN") {
-      async function ListUserData() {
-        try {
-          const response = await getAPI("http://localhost:8080/user/auth/all");
-          const data = response.data.data;
-          if (RoleUser === "ROLE_ADMIN") {
-            const dataUser = data.filter((i) => i.role !== "ROLE_SUPERADMIN");
-            setData(dataUser);
-          } else {
-            setData(data);
-          }
-        } catch (error) {
-          console.error(">>err :", error);
-        }
-      }
-      ListUserData();
-    }
-  }, [RoleUser, count]);
+  // useEffect(() => {
+  //   if (RoleUser === "ROLE_SUPERADMIN" || RoleUser === "ROLE_ADMIN") {
+  //     async function ListUserData() {
+  //       try {
+  //         const response = await getAPI("http://localhost:8080/user/auth/all");
+  //         const data = response.data.data;
+  //         if (RoleUser === "ROLE_ADMIN") {
+  //           const dataUser = data.filter((i) => i.role !== "ROLE_SUPERADMIN");
+  //           setData(dataUser);
+  //         } else {
+  //           setData(data);
+  //         }
+  //       } catch (error) {
+  //         console.error(">>err :", error);
+  //       }
+  //     }
+  //     ListUserData();
+  //   }
+  // }, [RoleUser, count]);
+
+  const Data = [
+    {
+      id: 1,
+      nameUser: "Trung",
+      fullName: "trungbeo",
+      email: "trung@gmail.com",
+      role: "ROLE_SUPERADMIN",
+    },
+    {
+      id: 2,
+      nameUser: "Trun",
+      fullName: "trunbeo",
+      email: "trun@gmail.com",
+      role: "ROLE_SUPERADMIN",
+    },
+    {
+      id: 3,
+      nameUser: "Trug",
+      fullName: "trugbeo",
+      email: "trug@gmail.com",
+      role: "ROLE_SUPERADMIN",
+    },
+  ];
 
   const toggle = () => {
     setModal(!modal);
@@ -89,15 +113,20 @@ function ListUser(args) {
   function handleOpenEdit(a, role) {
     toggle();
     const infor = Data.find((i) => i.id === a);
+
+
+    
+    setProFileUser(infor);
+    setSelectedRole(role);
+  }
+  useEffect(() => {
     for (let index = 0; index < roleEnum.length; index++) {
-      if (role !== roleEnum[index].roleName) {
+      if (selectedRole !== roleEnum[index].roleName) {
         roleData.push(roleEnum[index]);
       }
     }
     setRoleTitle(roleData);
-    setProFileUser(infor);
-    setSelectedRole(role);
-  }
+  }, [selectedRole])
 
   function handleOpenDelete(itemID) {
     toggleDelete();
@@ -235,6 +264,7 @@ function ListUser(args) {
                       <select
                         value={selectedRole}
                         onChange={(e) => setSelectedRole(e.target.value)}
+                        className="selectRole"
                       >
                         <option value={`${selectedRole}`}>
                           {selectedRole}

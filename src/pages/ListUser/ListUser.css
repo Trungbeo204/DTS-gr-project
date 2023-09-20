@@ -67,3 +67,7 @@
   text-align: center !important;
   font-size: 25px !important
 }
+.selectRole{
+  width: 100%;
+  border: none;
+}
