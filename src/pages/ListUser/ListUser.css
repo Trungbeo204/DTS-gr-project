@@ -19,8 +19,8 @@
   outline: none;
 }
 .btn-open {
-  border: none;
-  background-color: rgba(0, 0, 0, 0);
+  border: none !important;
+  background-color: rgba(0, 0, 0, 0) !important;
 }
 .cantUpdate{
   display: none;
@@ -51,4 +51,19 @@
   border-radius: 8px;
   position: relative;
   left: 91.5%;
+}
+.btn-logOut{
+  border: none;
+  width: max-content;
+  padding: 0 3%;
+  background-color: lightsalmon;
+  color: white;
+  border-radius: 8px;
+}
+.btn-logOut:hover {
+  background-color: red;
+}
+.delete-box{
+  text-align: center !important;
+  font-size: 25px !important
 }

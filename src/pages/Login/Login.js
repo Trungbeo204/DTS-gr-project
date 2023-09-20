@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import "./Login.css";
 import { useNavigate } from "react-router-dom";
 
@@ -50,6 +50,10 @@ function Login() {
           const dataLogin = res.data.data;
           localStorage.setItem("token", dataLogin.token);
           localStorage.setItem("roleUser", dataLogin.role);
+          localStorage.setItem("nameClient", dataLogin.userName)
+          localStorage.setItem("fullNameClient", dataLogin.fullName)
+          localStorage.setItem("emailClient", dataLogin.email)
+          localStorage.setItem("idClient", dataLogin.id)
           const idRole = roleEnum.find((i) => i.role === dataLogin?.role);
           localStorage.setItem('idRole', idRole.id)
           toast.success("Đăng nhập thành công.");
@@ -61,13 +65,10 @@ function Login() {
         });
     },
   });
-  // console.log(1, dataUser);
-  // localStorage.setItem('role', dataUser.role)
 
   const handleToRegister = () => {
     next("/Register");
   };
-
   return (
     <>
       <div className="Login">
@@ -126,7 +127,7 @@ function Login() {
           pauseOnFocusLoss
           draggable
           pauseOnHover
-          theme="light"
+          theme="dark"
         />
       </div>
     </>

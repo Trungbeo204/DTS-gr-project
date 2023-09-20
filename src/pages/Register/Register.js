@@ -46,16 +46,15 @@ const Register = () => {
         fullName: values.fullName,
         email: values.email,
         passWordUser: values.password,
-      })
-        .then((res) => {
-          toast.success("Đăng ký thành công. ");
-          next("/Login");
-          console.log(res);
+      }).then((res) => {
+          if (res.data.status === '200') {
+            // toast.success(res.data.message);
+            alert(`${res.data.message}`)
+            next("/Login")
+          }else {
+            toast.error(res.data.message)
+          }
         })
-        .catch((err) => {
-          toast.error('Đăng ký không thành công. ');
-          console.log(err);
-        });
     },
   });
 

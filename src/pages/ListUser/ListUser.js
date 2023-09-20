@@ -22,14 +22,18 @@ import { setUser } from "../../reducer/userProfile";
 function ListUser(args) {
   const regexEmail = /^([a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6})*$/;
   const RoleUser = localStorage.getItem("roleUser");
-  const idRole = localStorage.getItem('idRole')
-  const dataUser = useSelector((state) => state.user);
+  const nameClient = localStorage.getItem("nameClient")
+  const fullNameClient = localStorage.getItem("fullNameClient")
+  const emailClient = localStorage.getItem("emailClient")
+  const idClient = localStorage.getItem("idClient")
 
   const [modal, setModal] = useState(false);
+  const [modalDelete, setModalDelete] = useState(false);
   const [Data, setData] = useState([]);
   const [proFileUser, setProFileUser] = useState();
   const [roleTitle, setRoleTitle] = useState([])
   const [selectedRole, setSelectedRole] = useState(proFileUser?.role);
+  const [idRole, setIdRole] = useState('')
   const [count, setCount] = useState(0);
   const name = useRef();
   const fullName = useRef();
@@ -51,7 +55,12 @@ function ListUser(args) {
         try {
           const response = await getAPI("http://localhost:8080/user/auth/all");
           const data = response.data.data;
-          setData(data);
+          if (RoleUser === 'ROLE_ADMIN') {
+            const dataUser = data.filter((i) => i.role !== 'ROLE_SUPERADMIN')
+            setData(dataUser)
+          }else{
+            setData(data);
+          }
         } catch (error) {
           console.error(">>err :", error);
         }
@@ -64,20 +73,41 @@ function ListUser(args) {
     setModal(!modal);
   };
 
+  const toggleDelete = () => {
+    setModalDelete(!modalDelete);
+  };
+
+  const externalCloseBtn = (
+    <button
+      type="button"
+      className="close"
+      // style={{ position: 'absolute', top: '150px', right: '15px' }}
+      onClick={toggleDelete}
+    >
+      &times;
+    </button>
+  );
+
   function handleOpenEdit(a, role) {
     toggle();
     const infor = Data.find((i) => i.id === a);
+    const idR = roleEnum.find((i)=>  i.roleName === role)
     for (let index = 0; index < roleEnum.length; index++) {
       if (role !== roleEnum[index].roleName) {
         roleData.push(roleEnum[index])
-      }
+      } 
     }
+    setIdRole(idR.id)
     setRoleTitle(roleData)
     setProFileUser(infor);
     setSelectedRole(role);
   }
 
-  console.log(proFileUser);
+  function handleOpenDelete(itemID) {
+    toggleDelete()
+    const infor = Data.find((i) => i.id === itemID);
+    setProFileUser(infor);
+  }
 
   const handleSave = async (id) => {
     try {
@@ -95,7 +125,7 @@ function ListUser(args) {
         userName: name.current.value,
         fullName: fullName.current.value,
         email: email.current.value,
-        idRole: selectedRole
+        role: selectedRole
       })
         .then((res) => {
           toast.success("Cập nhật thành công");
@@ -110,8 +140,8 @@ function ListUser(args) {
     }
   };
 
-  function handleDelete(itemID) {
-    deleteAPI("")
+  function handleDelete() {
+    getAPI(`http://localhost:8080/user/auth/delete/${proFileUser?.id}`)
       .then((res) => {
         toast.success("Xóa thành công ");
         setCount(count + 1);
@@ -119,13 +149,14 @@ function ListUser(args) {
       .catch((err) => {
         console.log(err);
       });
+    toggleDelete()
   }
 
   const handleCancel = () => {
     toggle();
   };
 
-  const handleSaveClient = async () => {
+  const handleSaveClient = async (id) => {
     try {
       if (name.current.value === "") {
         toast.error("tên không được để trống.");
@@ -136,16 +167,20 @@ function ListUser(args) {
       if (email.current.value === "") {
         toast.error("email không được để trống.");
       }
-      postAPI("", {
-        nameUser: name.current.value,
+      postAPItoken(`http://localhost:8080/user/auth/update/${id}`, {
+        userName: name.current.value,
         fullName: fullName.current.value,
         email: email.current.value,
       })
         .then((res) => {
-          dispatch(setUser(res));
+          localStorage.setItem('nameClient', name.current.value)
+          localStorage.setItem('nameClient', fullName.current.value)
+          localStorage.setItem('nameClient', email.current.value)
           toast.success("thay đổi thành công. ");
+          handleLogout()
         })
         .catch((err) => {
+          toast.error("thay đổi thất bại. ");
           console.log(err);
         });
     } catch (error) {
@@ -157,6 +192,7 @@ function ListUser(args) {
     localStorage.removeItem("token");
     next("/Login");
   }
+
 
   return (
     <div>
@@ -208,7 +244,7 @@ function ListUser(args) {
                         <option value={`${selectedRole}`}>{selectedRole}</option>
                         {roleTitle.map((item, index) =>{
                           return(
-                          <option value={`${item?.id}`} key={index}>{item?.roleName}</option>)
+                          <option value={`${item?.roleName}`} key={index}>{item?.roleName}</option>)
                         })}
                       </select>
                     </td>
@@ -226,7 +262,24 @@ function ListUser(args) {
             </Button>
           </ModalFooter>
         </Modal>
-          <button onClick={handleLogout}> Log out</button>
+
+        <div>
+          <Modal isOpen={modalDelete} toggle={toggleDelete} className="delete-box">
+            <ModalHeader toggle={toggleDelete} external={externalCloseBtn}>
+              Xóa User {`${proFileUser?.userName}`}
+            </ModalHeader>
+            <ModalBody>Bạn chắc chắn muốn xóa user ?</ModalBody>
+            <ModalFooter>
+              <Button color="danger" onClick={handleDelete}>
+                Delete
+              </Button>{" "}
+              <Button color="secondary" onClick={toggleDelete}>
+                Cancel
+              </Button>
+            </ModalFooter>
+          </Modal>
+        </div>
+
         {(RoleUser === "ROLE_SUPERADMIN" || RoleUser === "ROLE_ADMIN") && (
           <>
             <h1>List User</h1>
@@ -264,7 +317,7 @@ function ListUser(args) {
                         {RoleUser === "ROLE_SUPERADMIN" && (
                           <button
                             className="btn-open"
-                            onClick={() => handleDelete(item?.id)}
+                            onClick={() => handleOpenDelete(item?.id)}
                           >
                             <FontAwesomeIcon icon={faDeleteLeft} />
                           </button>
@@ -279,34 +332,38 @@ function ListUser(args) {
         )}
         {RoleUser === "ROLE_CLIENT" && (
           <div className="client-box">
-            <p>Profile {`${dataUser?.name}`}</p>
+            <p>Profile {`${nameClient}`}</p>
             <div className="profile-client">
               <table>
                 <tr>
                   <td>Name</td>
                   <td>
-                    <input defaultValue={dataUser?.userName} ref={name} />
+                    <input defaultValue={nameClient} ref={name} />
                   </td>
                 </tr>
                 <tr>
                   <td>Full name</td>
                   <td>
-                    <input defaultValue={dataUser?.fullName} ref={fullName} />
+                    <input defaultValue={fullNameClient} ref={fullName} />
                   </td>
                 </tr>
                 <tr>
                   <td>Email</td>
                   <td>
-                    <input defaultValue={dataUser?.email} ref={email} />
+                    <input defaultValue={emailClient} ref={email} />
                   </td>
                 </tr>
               </table>
             </div>
-            <button onClick={handleSaveClient} className="btn-save">
+            <button onClick={() =>handleSaveClient(idClient)} className="btn-save">
               Save
             </button>
           </div>
         )}
+        <button onClick={handleLogout} className="btn-logOut">
+          {" "}
+          Log out
+        </button>
         <ToastContainer
           position="top-right"
           autoClose={3000}
