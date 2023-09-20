@@ -22,43 +22,50 @@ import { setUser } from "../../reducer/userProfile";
 function ListUser(args) {
   const regexEmail = /^([a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6})*$/;
   const RoleUser = localStorage.getItem("roleUser");
-  const dataUser = useSelector((state) => state.user);
+  const nameClient = localStorage.getItem("nameClient");
+  const fullNameClient = localStorage.getItem("fullNameClient");
+  const emailClient = localStorage.getItem("emailClient");
+  const idClient = localStorage.getItem("idClient");
 
   const [modal, setModal] = useState(false);
   const [modalDelete, setModalDelete] = useState(false);
-  // const [Data, setData] = useState([]);
+  const [Data, setData] = useState([]);
   const [proFileUser, setProFileUser] = useState();
-  const [selectedRole, setSelectedRole] = useState(1);
+  const [roleTitle, setRoleTitle] = useState([]);
+  const [selectedRole, setSelectedRole] = useState(proFileUser?.role);
   const [count, setCount] = useState(0);
   const name = useRef();
   const fullName = useRef();
   const email = useRef();
-  const password = useRef();
   const next = useNavigate();
   const dispatch = useDispatch();
+  const roleData = [];
 
-  // useEffect(() => {
-  //   if (RoleUser === "ROLE_SUPERADMIN" || RoleUser === "ROLE_ADMIN") {
-  //     async function ListUserData() {
-  //       try {
-  //         const response = await getAPI("");
-  //         const data = response.data;
-  //         setData(data);
-  //       } catch (error) {
-  //         console.error(">>err :", error);
-  //       }
-  //     }
-  //     ListUserData();
-  //   }
-  // }, [RoleUser, count]);
-  const Data = [
-    {
-      userName: " trung ",
-      fullName: "trungbeo",
-      email: "tungbeo@gmail.com",
-      role: "SUPERADMIN",
-    },
+  const roleEnum = [
+    { id: 3, roleName: "ROLE_SUPERADMIN" },
+    { id: 2, roleName: "ROLE_ADMIN" },
+    { id: 3, roleName: "ROLE_CLIENT" },
   ];
+
+  useEffect(() => {
+    if (RoleUser === "ROLE_SUPERADMIN" || RoleUser === "ROLE_ADMIN") {
+      async function ListUserData() {
+        try {
+          const response = await getAPI("http://localhost:8080/user/auth/all");
+          const data = response.data.data;
+          if (RoleUser === "ROLE_ADMIN") {
+            const dataUser = data.filter((i) => i.role !== "ROLE_SUPERADMIN");
+            setData(dataUser);
+          } else {
+            setData(data);
+          }
+        } catch (error) {
+          console.error(">>err :", error);
+        }
+      }
+      ListUserData();
+    }
+  }, [RoleUser, count]);
 
   const toggle = () => {
     setModal(!modal);
@@ -82,6 +89,12 @@ function ListUser(args) {
   function handleOpenEdit(a, role) {
     toggle();
     const infor = Data.find((i) => i.id === a);
+    for (let index = 0; index < roleEnum.length; index++) {
+      if (role !== roleEnum[index].roleName) {
+        roleData.push(roleEnum[index]);
+      }
+    }
+    setRoleTitle(roleData);
     setProFileUser(infor);
     setSelectedRole(role);
   }
@@ -91,30 +104,29 @@ function ListUser(args) {
     const infor = Data.find((i) => i.id === itemID);
     setProFileUser(infor);
   }
-  console.log(selectedRole);
 
   const handleSave = async (id) => {
     try {
       if (name.current.value === "") {
         toast.error("tên không được để trống.");
-      }
-      if (fullName.current.value === "") {
+      } else if (fullName.current.value === "") {
         toast.error("tên đầy đủ không được để trống.");
-      }
-      if (email.current.value === "") {
+      } else if (email.current.value === "") {
         toast.error("email không được để trống.");
       } else if (!regexEmail.test(email.current.value)) {
         toast.error("không đúng định dạng email.");
       }
 
-      await postAPItoken(`http://localhost:8080/user/auth/update/${id}`, {
-        nameUser: name.current.value,
+      await postAPItoken(`http://localhost:8080/user/auth/updateAll/${id}`, {
+        userName: name.current.value,
         fullName: fullName.current.value,
         email: email.current.value,
+        role: selectedRole,
       })
         .then((res) => {
           toast.success("Cập nhật thành công");
           setCount(count + 1);
+          toggle();
         })
         .catch((err) => {
           console.log(err);
@@ -125,8 +137,7 @@ function ListUser(args) {
   };
 
   function handleDelete() {
-    console.log(">>itemID : ", proFileUser?.id);
-    deleteAPI("")
+    getAPI(`http://localhost:8080/user/auth/delete/${proFileUser?.id}`)
       .then((res) => {
         toast.success("Xóa thành công ");
         setCount(count + 1);
@@ -141,7 +152,7 @@ function ListUser(args) {
     toggle();
   };
 
-  const handleSaveClient = async () => {
+  const handleSaveClient = async (id) => {
     try {
       if (name.current.value === "") {
         toast.error("tên không được để trống.");
@@ -152,16 +163,20 @@ function ListUser(args) {
       if (email.current.value === "") {
         toast.error("email không được để trống.");
       }
-      postAPI("", {
-        nameUser: name.current.value,
+      postAPItoken(`http://localhost:8080/user/auth/update/${id}`, {
+        userName: name.current.value,
         fullName: fullName.current.value,
         email: email.current.value,
       })
         .then((res) => {
-          dispatch(setUser(res));
+          localStorage.setItem("nameClient", name.current.value);
+          localStorage.setItem("nameClient", fullName.current.value);
+          localStorage.setItem("nameClient", email.current.value);
           toast.success("thay đổi thành công. ");
+          handleLogout();
         })
         .catch((err) => {
+          toast.error("thay đổi thất bại. ");
           console.log(err);
         });
     } catch (error) {
@@ -170,7 +185,7 @@ function ListUser(args) {
   };
 
   function handleLogout() {
-    localStorage.removeItem("token");
+    localStorage.clear();
     next("/Login");
   }
 
@@ -186,7 +201,7 @@ function ListUser(args) {
                   <tr>
                     <td>Name</td>
                     <td>
-                      <input defaultValue={proFileUser?.userName} ref={name} />
+                      <input defaultValue={proFileUser?.nameUser} ref={name} />
                     </td>
                   </tr>
                   <tr>
@@ -206,22 +221,6 @@ function ListUser(args) {
                         defaultValue={proFileUser?.email}
                         ref={email}
                       />
-                      <input defaultValue={proFileUser?.email} ref={email} />
-                    </td>
-                  </tr>
-                  <tr
-                    className={`${
-                      RoleUser === "ROLE_SUPERADMIN"
-                        ? "canUpdate"
-                        : "cantUpdate"
-                    }`}
-                  >
-                    <td>Password</td>
-                    <td>
-                      <input
-                        defaultValue={proFileUser?.passWordUser}
-                        ref={password}
-                      />
                     </td>
                   </tr>
                   <tr
@@ -237,9 +236,16 @@ function ListUser(args) {
                         value={selectedRole}
                         onChange={(e) => setSelectedRole(e.target.value)}
                       >
-                        <option value="3">SUPER ADMIN</option>
-                        <option value="2">ADMIN</option>
-                        <option value="1">CLIENT</option>
+                        <option value={`${selectedRole}`}>
+                          {selectedRole}
+                        </option>
+                        {roleTitle.map((item, index) => {
+                          return (
+                            <option value={`${item?.roleName}`} key={index}>
+                              {item?.roleName}
+                            </option>
+                          );
+                        })}
                       </select>
                     </td>
                   </tr>
@@ -293,9 +299,9 @@ function ListUser(args) {
               </thead>
               {Data.map((item, index) => {
                 return (
-                  <tbody className="table-body">
+                  <tbody key={index} className="table-body">
                     <tr>
-                      <th>{item.userName}</th>
+                      <th>{item.nameUser}</th>
                       <td>{item.fullName}</td>
                       <td>{item.email}</td>
                       <td>{item.role}</td>
@@ -330,30 +336,33 @@ function ListUser(args) {
         )}
         {RoleUser === "ROLE_CLIENT" && (
           <div className="client-box">
-            <p>Profile {`${dataUser?.name}`}</p>
+            <p>Profile {`${nameClient}`}</p>
             <div className="profile-client">
               <table>
                 <tr>
                   <td>Name</td>
                   <td>
-                    <input defaultValue={dataUser?.name} ref={name} />
+                    <input defaultValue={nameClient} ref={name} />
                   </td>
                 </tr>
                 <tr>
                   <td>Full name</td>
                   <td>
-                    <input defaultValue={dataUser?.fullName} ref={fullName} />
+                    <input defaultValue={fullNameClient} ref={fullName} />
                   </td>
                 </tr>
                 <tr>
                   <td>Email</td>
                   <td>
-                    <input defaultValue={dataUser?.email} ref={email} />
+                    <input defaultValue={emailClient} ref={email} />
                   </td>
                 </tr>
               </table>
             </div>
-            <button onClick={handleSaveClient} className="btn-save">
+            <button
+              onClick={() => handleSaveClient(idClient)}
+              className="btn-save"
+            >
               Save
             </button>
           </div>

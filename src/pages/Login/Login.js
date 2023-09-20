@@ -27,11 +27,11 @@ function Login() {
   const formik = useFormik({
     initialValues: {
       userName: "",
-      password: "",
+      passWordUser: "",
     },
     validationSchema: yup.object().shape({
       userName: yup.string().required("bắt buộc"),
-      password: yup
+      passWordUser: yup
         .string()
         .min(8)
         .matches(
@@ -41,17 +41,21 @@ function Login() {
         .required("bắt buộc"),
     }),
     onSubmit: (values) => {
-      postAPI("", {
+      postAPI("http://localhost:8080/user/signin", {
         userName: values.userName,
-        passWordUser: values.password,
+        passWordUser: values.passWordUser,
       })
         .then((res) => {
           dispatch(setUser(res.data.data));
           const dataLogin = res.data.data;
           localStorage.setItem("token", dataLogin.token);
           localStorage.setItem("roleUser", dataLogin.role);
+          localStorage.setItem("nameClient", dataLogin.userName);
+          localStorage.setItem("fullNameClient", dataLogin.fullName);
+          localStorage.setItem("emailClient", dataLogin.email);
+          localStorage.setItem("idClient", dataLogin.id);
           const idRole = roleEnum.find((i) => i.role === dataLogin?.role);
-          localStorage.setItem('idRole', idRole)
+          localStorage.setItem("idRole", idRole.id);
           toast.success("Đăng nhập thành công.");
           next("/ListUser");
         })
@@ -65,7 +69,6 @@ function Login() {
   const handleToRegister = () => {
     next("/Register");
   };
-
   return (
     <>
       <div className="Login">
@@ -89,19 +92,22 @@ function Login() {
                 helperText={formik.touched.userName && formik.errors.userName}
               />
               <TextField
-                id="password"
-                name="password"
+                id="passWordUser"
+                name="passWordUser"
                 label="Mật khẩu"
                 type="password"
                 fullWidth
                 margin="normal"
                 variant="outlined"
-                value={formik.values.password}
+                value={formik.values.passWordUser}
                 onChange={formik.handleChange}
                 error={
-                  formik.touched.password && Boolean(formik.errors.password)
+                  formik.touched.passWordUser &&
+                  Boolean(formik.errors.passWordUser)
                 }
-                helperText={formik.touched.password && formik.errors.password}
+                helperText={
+                  formik.touched.passWordUser && formik.errors.passWordUser
+                }
               />
             </div>
             <Box mt={5} className="btn-box">

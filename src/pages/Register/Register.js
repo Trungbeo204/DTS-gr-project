@@ -41,25 +41,25 @@ const Register = () => {
         ),
     }),
     onSubmit: (values) => {
-      postAPI("", {
-        name: values.name,
+      postAPI("http://localhost:8080/user/signup", {
+        nameUser: values.name,
         fullName: values.fullName,
         email: values.email,
-        password: values.password,
-      })
-        .then((res) => {
-          toast.success("Đăng ký thành công. ");
+        passWordUser: values.password,
+      }).then((res) => {
+        if (res.data.status === "200") {
+          // toast.success(res.data.message);
+          alert(`${res.data.message}`);
           next("/Login");
-        })
-        .catch((err) => {
-          toast.error('Đăng ký không thành công. ');
-          console.log(err);
-        });
+        } else {
+          toast.error(res.data.message);
+        }
+      });
     },
   });
 
   function handleToLogin() {
-    next('/Login')
+    next("/Login");
   }
 
   return (
@@ -137,13 +137,13 @@ const Register = () => {
               formik.touched.confirmPassword && formik.errors.confirmPassword
             }
           />
-          <Box mt={5} className='btn-box'>
+          <Box mt={5} className="btn-box">
             <Button type="submit" variant="contained" color="primary">
               Đăng ký
             </Button>
             <p onClick={handleToLogin} id="btn-Register">
-                Đăng nhập
-              </p>
+              Đăng nhập
+            </p>
           </Box>
         </form>
         <ToastContainer
