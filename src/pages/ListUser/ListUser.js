@@ -26,9 +26,9 @@ function ListUser(args) {
 
   const [modal, setModal] = useState(false);
   const [modalDelete, setModalDelete] = useState(false);
-  const [Data, setData] = useState([]);
+  // const [Data, setData] = useState([]);
   const [proFileUser, setProFileUser] = useState();
-  const [selectedRole, setSelectedRole] = useState();
+  const [selectedRole, setSelectedRole] = useState(1);
   const [count, setCount] = useState(0);
   const name = useRef();
   const fullName = useRef();
@@ -37,20 +37,28 @@ function ListUser(args) {
   const next = useNavigate();
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    if (RoleUser === "ROLE_SUPERADMIN" || RoleUser === "ROLE_ADMIN") {
-      async function ListUserData() {
-        try {
-          const response = await getAPI("");
-          const data = response.data;
-          setData(data);
-        } catch (error) {
-          console.error(">>err :", error);
-        }
-      }
-      ListUserData();
-    }
-  }, [RoleUser, count]);
+  // useEffect(() => {
+  //   if (RoleUser === "ROLE_SUPERADMIN" || RoleUser === "ROLE_ADMIN") {
+  //     async function ListUserData() {
+  //       try {
+  //         const response = await getAPI("");
+  //         const data = response.data;
+  //         setData(data);
+  //       } catch (error) {
+  //         console.error(">>err :", error);
+  //       }
+  //     }
+  //     ListUserData();
+  //   }
+  // }, [RoleUser, count]);
+  const Data = [
+    {
+      userName: " trung ",
+      fullName: "trungbeo",
+      email: "tungbeo@gmail.com",
+      role: "SUPERADMIN",
+    },
+  ];
 
   const toggle = () => {
     setModal(!modal);
@@ -79,10 +87,11 @@ function ListUser(args) {
   }
 
   function handleOpenDelete(itemID) {
-    toggleDelete()
+    toggleDelete();
     const infor = Data.find((i) => i.id === itemID);
     setProFileUser(infor);
   }
+  console.log(selectedRole);
 
   const handleSave = async (id) => {
     try {
@@ -125,7 +134,7 @@ function ListUser(args) {
       .catch((err) => {
         console.log(err);
       });
-    toggleDelete()
+    toggleDelete();
   }
 
   const handleCancel = () => {
@@ -249,7 +258,11 @@ function ListUser(args) {
         </Modal>
 
         <div>
-          <Modal isOpen={modalDelete} toggle={toggleDelete} className="delete-box">
+          <Modal
+            isOpen={modalDelete}
+            toggle={toggleDelete}
+            className="delete-box"
+          >
             <ModalHeader toggle={toggleDelete} external={externalCloseBtn}>
               Xóa User {`${proFileUser?.userName}`}
             </ModalHeader>
